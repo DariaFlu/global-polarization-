@@ -1,0 +1,13 @@
+# Compiled files
+*.pcm
+*.d
+*.so
+
+# General ignore patterns
+*~
+*.swp
+*.bak
+*.tmp
+
+#out file
+*.root
