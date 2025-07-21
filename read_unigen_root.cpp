@@ -32,6 +32,28 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
         Int_t fNpa;
         TString fComment;
 
+        Double_t fSigmaPol;
+
+        Double_t fpolx  = 0; 
+        Double_t fpolSx = 0.07;  
+        Double_t fpoly  = 0;
+        Double_t fpolSy = 0.07; 
+        Double_t fpolz  = 0;
+        Double_t fpolSz = 0.07;
+
+        Double_t fHistPolX_0;
+        Double_t fHistPolY_0;
+        Double_t fHistPolZ_0;
+
+        Double_t fHistPolX_1;
+        Double_t fHistPolY_1;
+        Double_t fHistPolZ_1;
+
+        Double_t fHistPolX;
+        Double_t fHistPolY;
+        Double_t fHistPolZ;
+        Double_t fHistPolMag;
+
         //TClonesArray *fParticles;
 
         TClonesArray *fLambdas = new TClonesArray("UParticle");
@@ -77,6 +99,11 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
             fStepT = right.GetStepT();
             fNpa = right.GetNpa();
             fComment = "";
+
+            // fHistPolX = new TH1D("hPolX", "Lambda polarization X component", 100, -1.0, 1.0);
+            // fHistPolY = new TH1D("hPolY", "Lambda polarization Y component", 100, -1.0, 1.0);
+            // fHistPolZ = new TH1D("hPolZ", "Lambda polarization Z component", 100, -1.0, 1.0);
+            // fHistPolMag = new TH1D("hPolMag", "Lambda polarization magnitude", 100, 0.0, 1.5);
         }
 
         void Init(const UEvent& right){
@@ -130,6 +157,8 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
             return static_cast<UParticle*>(fPions->At(index));
         }
 
+        void SetPolarizationSigma(Double_t _fSigmaPol) { fSigmaPol = _fSigmaPol; }
+
         void SetPolarizationAxis(){
 
             TVector3 b(fB, 0, 0); // Impact parameter direction
@@ -138,7 +167,33 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
             rotation.SetZAxis(polarizationAxis).RotateZ(0);
         }
 
-        void RotateProtons() {
+        void SetPolarization(UParticle& lambda, Double_t polx, Double_t poly, Double_t polz)
+        {
+           if(polx || poly || polz) {
+            TLorentzVector lambda_lab = lambda.GetMomentum();
+            TVector3 beta = -lambda_lab.BoostVector();
+            TLorentzVector lambda_rest = lambda_lab;
+            lambda_rest.Boost(beta);
+
+            lambda_rest.SetTheta(TMath::ACos(polz/TMath::Sqrt(polx*polx+poly*poly+polz*polz)));
+            lambda_rest.SetPhi(TMath::Pi()+TMath::ATan2(-poly,-polx));
+            lambda_rest.Boost(-beta);
+            lambda.GetMomentum().SetTheta(lambda_rest.Theta());
+            lambda.GetMomentum().SetPhi(lambda_rest.Phi());
+            //std::cout << lamTV.Theta() << " = ";
+                // lambda.GetMomentum().SetTheta(TMath::ACos(polz/TMath::Sqrt(polx*polx+poly*poly+polz*polz)));
+                // lambda.GetMomentum().SetPhi(TMath::Pi()+TMath::ATan2(-poly,-polx));
+            // lamTV.SetTheta(TMath::ACos(polz/TMath::Sqrt(polx*polx+poly*poly+polz*polz)));
+            // lamTV.SetPhi(TMath::Pi()+TMath::ATan2(-poly,-polx));
+            // //std::cout << lamTV.Theta() << std::endl;
+            // lambda.SetMomentum(lamTV);
+           } else {
+              Double_t fPolarTheta = -99;
+              Double_t fPolarPhi = -99;
+           }
+        }
+
+        void RotateProtons() { //Add % polarization
             const Int_t nProtons = fProtons->GetEntriesFast();
             for (Int_t i = 0; i < nProtons; i++) {
                 UParticle* proton = static_cast<UParticle*>(fProtons->At(i));
@@ -150,10 +205,65 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
             }
         }
 
-        void RotateProton(UParticle& proton){
+        void RotateProton(UParticle& proton){ 
             TLorentzVector p = proton.GetMomentum();
             p.Transform(rotation);
             proton.SetMomentum(p);
+        }
+
+        void RotateLambda(UParticle& lambda, Double_t _fSigmaPol = 0.3){ 
+            //std::cout << 1 << std::endl;
+            SetPolarizationSigma(_fSigmaPol);
+            
+            Double_t polX = gRandom->Gaus(fpolx,fpolSx);  // generate polarization direction
+            Double_t polY = gRandom->Gaus(fpoly,fpolSy);  // generate polarization direction
+            Double_t polZ = gRandom->Gaus(fpolz,fpolSz);  // generate polarization direction
+            TVector3 polarizationVec(polX, polY, polZ);
+
+            fHistPolX_0=polarizationVec.X();
+            fHistPolY_0=polarizationVec.Y();
+            fHistPolZ_0=polarizationVec.Z();
+
+            ROOT::Math::RotationZ rotateRP(fPhi);  // set rotation transformation
+            polarizationVec = rotateRP*polarizationVec;  // rotate reaction plane
+
+
+            fHistPolX_1=polarizationVec.X();
+            fHistPolY_1=polarizationVec.Y();
+            fHistPolZ_1=polarizationVec.Z();
+
+            Float_t polmag = TMath::Sqrt(polarizationVec.Mag());
+            // special case, overpolarized -> 100% polarized
+            if (polmag>1.) {
+                polarizationVec *= 1./polmag;  // scale to 1
+               polmag = 1.;
+            }
+            // special case, no polarization -> generate random direction
+            if (polmag == 0) {
+            // random unitary vector, see https://mathworld.wolfram.com/SpherePointPicking.html
+               Double_t x1,x2,R2,R;
+               do {
+                  x1 = 1-2*gRandom->Rndm();
+                  x2 = 1-2*gRandom->Rndm();
+                  R2 = x1*x1+x2*x2;
+               } while(R2 >= 1);
+               R=2*TMath::Sqrt(1-R2);
+               polarizationVec.SetXYZ(x1*R, x2*R, 1-2*R2);  // random unitary vector - background for signal
+            }
+   
+            Float_t xxx = gRandom->Rndm();
+            if (xxx < 1./2.*(1.-polmag)) {  // probability of spin flip
+                polarizationVec *= -1.;  // spin flip according to mean polarization
+            }
+            // part->SetPolarisation(polarizationVec.X(),polarizationVec.Y(),polarizationVec.Z());    
+            SetPolarization(lambda, polarizationVec.X(),polarizationVec.Y(),polarizationVec.Z());
+
+                // Fill histograms BEFORE any adjustments
+
+            fHistPolX=polarizationVec.X();
+            fHistPolY=polarizationVec.Y();
+            fHistPolZ=polarizationVec.Z();
+            fHistPolMag=polmag;
         }
 
         void Clear(){
@@ -168,31 +278,26 @@ class UUEvent : public UEvent { //Custom inherited class. Here are added new met
 
 
 void get_particles(const char* filename, Int_t fPdg);
-void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag = 1, Int_t enhanceStat = 1);
+void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t flag = 1, Int_t enhanceStat = 1);
 void calc_global_polarization(TString InFileName, TString OutFileName);
+void Lambda_v1_v2_P_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda); //Valeriy's function for properly lambda generation
 
 Double_t GetRandomValue   (Double_t fMean, Double_t fSigma);
 Int_t    returnNumberOfBin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue, Int_t NBins); 
 
-double generateCosTheta(double alpha) {
-    TRandom3* rand = new TRandom3(0);
-    double r = rand->Uniform(0, 1); // Random number [0,1]
-    delete rand;
+double generateCosTheta(double alpha, double PolarizationPercent = 0.6) {
 
-    // Solve quadratic equation for inverse CDF:
-    // r = 0.5*(1 + x) + alpha/4*(x² - 1)
-    // Rearranged to: (alpha/2)x² + x - (- 1 + alpha/2 + 2r) = 0
-    double a = alpha/2.0;
-    double b = 1.0;
-    // double c = -(1.0 + alpha/2.0 - 2.0*r);
-    double c = -(-1.0+alpha/2.0 + 2.0*r);
+    TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*[1]*x", -1.0, 1.0);
+    // Set the parameters
+    randomCosTheta->SetParameters(alpha, PolarizationPercent);
+    // Generate a random value from the distribution
+    double value = randomCosTheta->GetRandom();
+    
+    // Clean up
+    delete randomCosTheta;
+    
+    return value;
 
-    double discriminant = b*b - 4.0*a*c;
-    double x1 = (-b + sqrt(discriminant))/(2.0*a);
-    double x2 = (-b - sqrt(discriminant))/(2.0*a);
-
-    // Return the root within [-1,1]
-    return (fabs(x1) <= 1.0) ? x1 : x2;
 }
 
 Double_t positivePhi(const Double_t& phi){
@@ -202,13 +307,15 @@ Double_t positivePhi(const Double_t& phi){
 }
 
 
-void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, Int_t enhanceStat) {
+void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t flag, Int_t enhanceStat) {
     // Open input file
     TFile *inFile = TFile::Open(inputFile, "READ");
     TTree *tree = (TTree*)inFile->Get("events");
     // Create output file and tree
     TFile *outFile;
     TTree *outTree;
+
+    TFile* Lambda_yield = TFile::Open(confInFile,"READ"); // File with TH2F pt-y
 
     UEvent  *inEvent = nullptr;
     UEvent  *outEvent  = new UEvent ();  // Unigen UEvent format
@@ -219,7 +326,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
     //Histograms
     TH1D *hLambdaPt;
     TH1D *hCosTheta;
-    TH1D *hProtonPhi;
+    TH1D *hLambdaPhi;
     TH2D *hAngVsPt;
 
     Int_t dummy[2];
@@ -240,7 +347,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
 
         hLambdaPt = new TH1D("hLambdaPt", "Lambda pT;pT [GeV/c];Counts", 100, 0, 3);
         hCosTheta = new TH1D("hCosTheta", "Proton cos(#theta);cos(#theta);Counts", 100, -1, 1);
-        hProtonPhi= new TH1D("hProtonPhi", "Proton (#Delta#varphi);#Delta#varphi;Counts", 100, 0, 2.*TMath::Pi());
+        hLambdaPhi= new TH1D("hLambdaPhi", "Lambda (#Delta#varphi);#Delta#varphi;Counts", 100, 0, 2.*TMath::Pi());
 
         hAngVsPt  = new TH2D("hAngVsPt", "cos(#theta) vs Lambda pT;pT [GeV/c];cos(#theta)", 
                                    50, 0, 2, 50, -1, 1);
@@ -257,7 +364,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
 
         hLambdaPt = (TH1D*) outFile->Get("hLambdaPt");
         hCosTheta = (TH1D*) outFile->Get("hCosTheta");
-        hProtonPhi= (TH1D*) outFile->Get("hProtonPhi");
+        hLambdaPhi= (TH1D*) outFile->Get("hLambdaPhi");
         hAngVsPt  = (TH2D*) outFile->Get("hAngVsPt");
 
         // Connect branches
@@ -270,7 +377,14 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
     const double mProton = 0.938272;  // GeV/c²
     const double mPion   = 0.139570;  // GeV/c²
     
-    const double anisotropy = 0.732;  // Strength of anisotropy (-1 to 1)
+    Double_t fSigmaPolVal = 1.5;
+
+    const double anisotropy = 0.732;  // Strength of anisotropy 
+    const double polPercent = 0.6;  // Polarization percent
+
+    Double_t fBMin = 3.44;
+    Double_t fBMax = 7.44;
+
     // Process events
     Long64_t nEvents = tree->GetEntries();
     std::cout << "Events: " << nEvents << std::endl;
@@ -284,12 +398,17 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
         for (Int_t i = 0; i < inEvent->GetNpa(); i++) {
             UParticle* part = inEvent->GetParticle(i);
             if (part->GetPdg() != 3122) continue; // Select Lambdas (PDG code 3122)
+            if (inEvent->GetB() < fBMin || inEvent->GetB() > fBMax)  continue;
             lambda = *part;
             //Adding to custom UEvent class:
             outEvent->AddParticle(*part);
             outUEvent->UEvent::AddParticle(*part);
-            outUEvent->AddLambda(part);
-            
+            Lambda_v1_v2_P_parameterization(Lambda_yield, inEvent->GetB(), lambda);
+            // Lambda_v1_v2_P_parameterization(Lambda_yield, (inEvent->GetB() > fBMin && inEvent->GetB() < fBMax) ? inEvent->GetB() : 7., lambda);
+
+            outUEvent->AddLambda(&lambda);
+            outUEvent->RotateLambda(lambda, fSigmaPolVal);// !!!!!!!!!!!!!!!
+
             // Get Lambda 4-momentum
             TLorentzVector lambda_lab(part->Px(), part->Py(), part->Pz(), part->E());
             hLambdaPt->Fill(lambda_lab.Pt());
@@ -307,8 +426,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
             // Generate random angles phi
             double phi = rand->Uniform(0, 2*TMath::Pi());
 
-            double alpha = 0.732;
-            double cos_theta = generateCosTheta(alpha);
+            // double alpha = 0.732;
+            double cos_theta = generateCosTheta(anisotropy, polPercent);
             double sin_theta = sqrt(1 - cos_theta*cos_theta);
             
             // Store proton angle
@@ -341,19 +460,21 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
             //Proton rotation
             outUEvent->SetPolarizationAxis();
             outUEvent->RotateProton(proton);
+
             outUEvent->AddProton(&proton);
             outUEvent->AddPion(&pion);
 
             // Fill histograms
             hCosTheta->Fill(cos_theta);
             hAngVsPt->Fill(lambda_lab.Pt(), cos_theta);
-            hProtonPhi->Fill(positivePhi(proton.GetMomentum().Phi()));
-            //hProtonPhi->Fill(proton.GetMomentum().Phi());
+            // hLambdaPhi->Fill(positivePhi(proton.GetMomentum().Phi()));
+            hLambdaPhi->Fill(positivePhi(lambda.GetMomentum().Phi()));
 
             Double_t fEnhanceStat = enhanceStat;
             while(fEnhanceStat > 1){ //enhancing of lambdas
                 enhancedFlag = -9;
 
+                //add random function
                 TLorentzVector mom_rand( //generating momentum
                     GetRandomValue(part->Px(), 0.03),
                     GetRandomValue(part->Py(), 0.03),
@@ -372,6 +493,10 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
                 enhancedLambda.SetPosition(pos_rand);
                 enhancedLambda.SetMate(enhancedFlag);
 
+                Lambda_v1_v2_P_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+                // Lambda_v1_v2_P_parameterization(Lambda_yield, (inEvent->GetB() > fBMin && inEvent->GetB() < fBMax) ? inEvent->GetB() : 7., lambda);
+                outUEvent->RotateLambda(enhancedLambda, fSigmaPolVal);// !!!!!!!!!!!!!!!
+
                 // Process decay. Same logic
                 TLorentzVector lambda_lab = enhancedLambda.GetMomentum();
                 hLambdaPt->Fill(lambda_lab.Pt());
@@ -382,7 +507,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
                                  (2*mLambda);
                 
                 double phi = rand->Uniform(0, 2*TMath::Pi());
-                double cos_theta = generateCosTheta(anisotropy);
+                double cos_theta = generateCosTheta(anisotropy, polPercent);
                 double sin_theta = sqrt(1 - cos_theta*cos_theta);
                 
                 // Create decay products
@@ -418,7 +543,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
                 // Fill histograms
                 hCosTheta->Fill(cos_theta);
                 hAngVsPt->Fill(lambda_lab.Pt(), cos_theta);
-                hProtonPhi->Fill(positivePhi(protonEnhanced.GetMomentum().Phi()));
+                // hLambdaPhi->Fill(positivePhi(protonEnhanced.GetMomentum().Phi()));
+                hLambdaPhi->Fill(positivePhi(enhancedLambda.GetMomentum().Phi()));
 
                 fEnhanceStat--;
             }
@@ -431,7 +557,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
     outTree->Write("",TObject::kOverwrite);
     hLambdaPt->Write("",TObject::kOverwrite);
     hCosTheta->Write("",TObject::kOverwrite);
-    hProtonPhi->Write("",TObject::kOverwrite);
+    hLambdaPhi->Write("",TObject::kOverwrite);
     hAngVsPt->Write("",TObject::kOverwrite);
 
     // Plot results
@@ -440,7 +566,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
     c1->cd(1); hLambdaPt->Draw();
     c1->cd(2); hCosTheta->Draw();
     c1->cd(3); hAngVsPt->Draw("colz");
-    c1->cd(4); hProtonPhi->Draw();
+    c1->cd(4); hLambdaPhi->Draw();
 
     c1->SaveAs("lambda_decays_plots.png");
 
@@ -452,6 +578,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag, I
 
     outFile->Close();
     inFile->Close();
+    Lambda_yield->Close(); //proper file operation
+
 }
 
 
@@ -462,17 +590,19 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
     const double anisotropy = 0.732;  // Strength of anisotropy (-1 to 1)
 
     //--Parameters for binning
-    Int_t NpTBins = 10;//number of pT bins
-    Int_t NYBins = 15; //number of rapidity bins
-    Double_t fpTMax = 0.9; // max pT [GeV/c]
+    Int_t NpTBins = 11;//number of pT bins
+    Int_t NYBins = 11; //number of rapidity bins
+    Double_t fpTMax = 1.6; // max pT [GeV/c]
     Double_t fpTMin = 0.2; // min pT [GeV/c]
-    Double_t fYMax =  1.2; // max rapidity
-    Double_t fYMin = -1.2; // min rapidity
+    Double_t fYMax =  0.5; // max rapidity
+    Double_t fYMin = -0.5; // min rapidity
 
     //--Histograms--//
     TH1D* hProtonLambdaFrame_phi = new TH1D("hProtonLambdaFrame_phi", " ; #Delta#phi, rad;Counts", 50,  0, 2*TMath::Pi()); //proton phi* distribution (lambda frame)
-    TH1D* hProtonLabFrame_pT = new TH1D("hProtonLabFrame_pT", " proton lab frame ; p_{T}, GeV/c; Counts", 50,  0, 2.); //proton pT distribution (lab frame)
-    TH1D* hProtonLabFrame_Y  = new TH1D("hProtonLabFrame_Y", " proton lab frame ; Y; Counts", 50,  -2., 2.); //proton Y distribution (lab frame)
+    TH1D* hLambdaLabFrame_pT = new TH1D("hLambdaLabFrame_pT", " lambda lab frame ; p_{T}, GeV/c; Counts", 50,  0., 2.0); //proton pT distribution (lab frame)
+    TH1D* hlambdaLabFrame_Y  = new TH1D("hlambdaLabFrame_Y", " lambda lab frame ; Y; Counts", 50,  -1.5, 1.5); //lambda Y distribution (lab frame)
+    TH1D* hlambdaLabFrame_phiDistr  = new TH1D("hlambdaLabFrame_phiDistr", " lambda lab frame ; #Delta#phi; Counts", 100,  -1*TMath::Pi(), 2*TMath::Pi()); //lambda Y distribution (lab frame)
+
     TH1D* hProtonLambdaFrame_phi_pTBins[NpTBins]; //pT binnig
     TH1D* hProtonLambdaFrame_phi_YBins [NYBins ]; //rapidity binnig
     //loop for TH1D object instance 
@@ -505,32 +635,61 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
             proton = inUEvent->GetProton(iPart); //proton in lambda frame
             pion   = inUEvent->GetPion(iPart);   //pion   in lambda frame
 
+            
+
             Double_t phiStar = positivePhi(proton->GetMomentum().Phi()); //Get phi*
             hProtonLambdaFrame_phi->Fill(phiStar); //phi* distribution 
 
             TLorentzVector lambda_lab = lambda->GetMomentum();
             TVector3 beta = -lambda_lab.BoostVector(); //Get lorentz boost
 
-            TLorentzVector proton_lab = proton->GetMomentum(); // getting laboratory proton for further properly binning over [pT;Y]
-            proton_lab.Boost(beta);                             //boost proton to lab frame
+            TLorentzVector lambda_rest = lambda_lab;
+
+            lambda_rest.Boost(beta);
+            // hlambdaLabFrame_phiDistr->Fill((lambda_rest.Phi()));
+
+
+            // TLorentzVector proton_lab = proton->GetMomentum(); // getting laboratory proton for further properly binning over [pT;Y]
+            // proton_lab.Boost(beta);                             //boost proton to lab frame
+
+            // //if bin isn't uderflow or overflow then put phi*-distribution in histogram[number of bin]
+            // if(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins) > -1) hProtonLambdaFrame_phi_pTBins[(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
+            // if(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ) > -1) hProtonLambdaFrame_phi_YBins [(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ))]->Fill(phiStar); 
+
+            // //Filling pT and Y histograms
+            // hProtonLabFrame_pT->Fill(proton_lab.Pt());
+            // hlambdaLabFrame_Y->Fill(proton_lab.Rapidity());
 
             //if bin isn't uderflow or overflow then put phi*-distribution in histogram[number of bin]
-            if(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins) > -1) hProtonLambdaFrame_phi_pTBins[(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
-            if(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ) > -1) hProtonLambdaFrame_phi_YBins [(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ))]->Fill(phiStar); 
+            if(returnNumberOfBin(lambda_lab.Pt(),       fpTMin, fpTMax, NpTBins) > -1) hProtonLambdaFrame_phi_pTBins[(returnNumberOfBin(lambda_lab.Pt(),       fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
+            if(returnNumberOfBin(lambda_lab.Rapidity(), fYMin,  fYMax,  NYBins ) > -1) hProtonLambdaFrame_phi_YBins [(returnNumberOfBin(lambda_lab.Rapidity(), fYMin,  fYMax,  NYBins ))]->Fill(phiStar); 
+
+            // if(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins) > -1) hProtonLambdaFrame_phi_pTBins[(returnNumberOfBin(proton_lab.Pt(),       fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
+            // if(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ) > -1) hProtonLambdaFrame_phi_YBins [(returnNumberOfBin(proton_lab.Rapidity(), fYMin,  fYMax,  NYBins ))]->Fill(phiStar); 
+
 
             //Filling pT and Y histograms
-            hProtonLabFrame_pT->Fill(proton_lab.Pt());
-            hProtonLabFrame_Y->Fill(proton_lab.Rapidity());
+            hLambdaLabFrame_pT->Fill(lambda_lab.Pt());
+            hlambdaLabFrame_Y ->Fill(lambda_lab.Rapidity());
+            // hlambdaLabFrame_phiDistr->Fill(positivePhi(lambda->GetMomentum().Phi()));
+            // hlambdaLabFrame_phiDistr->Fill(positivePhi(lambda_rest.Phi()));
+            hlambdaLabFrame_phiDistr->Fill((lambda_rest.Phi()));
+
+            // hlambdaLabFrame_phiDistr->Fill(positivePhi(lambda_rest.Theta()));
+
+            // hlambdaLabFrame_phiDistr->Fill(positivePhi(lambda->GetMomentum().Theta()));
+
+
         }
 
     }
     //--pT binning--//
-    TH1D* hphi_pTBins= new TH1D("hphi_pTBins", " p_{T} binning; p_{T}, GeV/c; P_{#lambda}", NpTBins,  fpTMin, fpTMax); // Histogram with pT bins
+    TH1D* hphi_pTBins= new TH1D("hphi_pTBins", " p_{T} binning; p_{T}, GeV/c; P_{#lambda} %", NpTBins,  fpTMin, fpTMax); // Histogram with pT bins
     for(Int_t iHisto = 0; iHisto < NpTBins; iHisto++) { //Loop over pT bins
         hProtonLambdaFrame_phi_pTBins[iHisto]->Fit(fitPhiDistro);
         hProtonLambdaFrame_phi_pTBins[iHisto]->Write();
-        hphi_pTBins->SetBinContent(iHisto+1, (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy));
-        hphi_pTBins->SetBinError  (iHisto+1, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy));
+        hphi_pTBins->SetBinContent(iHisto+1, (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy)*100);
+        hphi_pTBins->SetBinError  (iHisto+1, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)*100);
     }
 
     hphi_pTBins->SetMarkerStyle(23); // Filled circle (ROOT default)
@@ -539,12 +698,12 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
 
     //--Y binning--//
     //same logic like in previous one
-    TH1D* hphi_YBins= new TH1D("hphi_YBins", " rapidity binning; Y; P_{#lambda}", NYBins,  fYMin, fYMax);
+    TH1D* hphi_YBins= new TH1D("hphi_YBins", " rapidity binning; Y; P_{#lambda} %", NYBins,  fYMin, fYMax);
     for(Int_t iHisto = 0; iHisto < NYBins; iHisto++) {
         hProtonLambdaFrame_phi_YBins[iHisto]->Fit(fitPhiDistro);
         hProtonLambdaFrame_phi_YBins[iHisto]->Write();
-        hphi_YBins->SetBinContent(iHisto+1, (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy));
-        hphi_YBins->SetBinError(iHisto+1, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy));
+        hphi_YBins->SetBinContent(iHisto+1, (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy)*100);
+        hphi_YBins->SetBinError(iHisto+1, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)*100);
     }
 
     hphi_YBins->SetMarkerStyle(23); // Filled circle (ROOT default)
@@ -557,22 +716,23 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
     lProtonLambdaFrame_phi->SetTextSize(0.05); 
     lProtonLambdaFrame_phi->SetBorderSize(0);   
     lProtonLambdaFrame_phi->AddEntry("", Form("p_{1} = %.3f #pm %.3f", fitPhiDistro->GetParameter(1), fitPhiDistro->GetParError(1)), "");
-    lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = %.3f #pm %.3f", (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy), (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)), "");
+    lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = %.0f #pm %.0f %%", (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy)*100, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)*100), "");
     lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = (8p_{1}) / (%.3f#pi)", anisotropy), "");
 
     // Plot results
     TCanvas *c1 = new TCanvas("c1", "proton", 1200, 800);
     c1->Divide(2,2);
     c1->cd(1); hProtonLambdaFrame_phi->Draw(); lProtonLambdaFrame_phi->Draw("same");
-    c1->cd(2); hProtonLabFrame_pT->Draw();
+    c1->cd(2); hLambdaLabFrame_pT->Draw();
     c1->cd(3); hphi_pTBins->Draw("PE");
     c1->cd(4); hphi_YBins->Draw("PE");
 
     c1->SaveAs("proton_polarization_plots.png");
     c1->Write();
-    hProtonLabFrame_pT->Write();
-    hProtonLabFrame_Y->Write();
+    hLambdaLabFrame_pT->Write();
+    hlambdaLabFrame_Y->Write();
     hProtonLambdaFrame_phi->Write();
+    hlambdaLabFrame_phiDistr->Write();
     outFile->Close();
     inFile->Close();
 }
@@ -599,3 +759,75 @@ Int_t returnNumberOfBin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     return (bin < NBins) ? bin : NBins-1;
 }
 
+void Lambda_v1_v2_P_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda){ //Valeriy's function for properly lambda generation
+
+	Double_t centrality; //centrality for parameterization (b->centrality for Xe+Xe below)
+	Double_t sNN = 2.87; // Energy of the collision in center-of-mass system
+	if(fBVal<3.44)
+                centrality=5;
+        else if(fBVal<4.88)
+                centrality=15;
+        else if(fBVal<5.84)
+                centrality=25;
+        else if(fBVal<6.64)
+                centrality=35;
+        else if(fBVal<7.44)
+                centrality=45;
+        else if(fBVal<8.08)
+                centrality=55;
+        else if(fBVal<8.72)
+                centrality=65;
+        else if(fBVal<9.36)
+                centrality=75;
+        else if(fBVal<9.84)
+                centrality=85;
+        else
+                centrality=95;
+
+
+	// TFile* Lambda_yield = new TFile("/lhep/users/dflusova/lambda/afterburner/v.6/qa_out_xexe.root","read"); // File with TH2F pt-y
+	TH2F* h_pt_y;
+	if(centrality<10)
+		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT010");
+	else if(centrality>10 && centrality <40)
+		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT");
+	else
+		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT40100");
+
+
+        Double_t lambda_pT; // pT of Lambda from pT-y TH2F
+	Double_t lambda_y;  // rapidity of Lambda from pT-y TH2F
+
+	h_pt_y->GetRandom2(lambda_y,lambda_pT);
+
+	Double_t v1 = (28.8635/(TMath::Power(sNN,2.89092))) * (  (-0.0233*centrality+0.5413* TMath::Power(centrality,1./3) ) * (163.536/18.0188 - 163.536/(lambda_pT +18.0188) )* lambda_y + ( -0.0056*centrality+0.377*TMath::Power(centrality,1./3) ) * (0.6653* lambda_pT - 0.6172 * TMath::Power(lambda_pT,2) +0.1154 * TMath::Power(lambda_pT,3) ) * TMath::Power(lambda_y,3) ); // v1 cent-pT-y func
+	Double_t v2 = 0.07; //uniform distribution
+
+	// generate phi according to v1 and v2
+      static TF1 f("f", "[0]*(1+2*[1]*TMath::Cos(x)+2*[2]*TMath::Cos(2*x))+[3]", 0,2*TMath::Pi());
+      Double_t a1=1+2*v1+2*v2;
+      Double_t a2=1-2*v1+2*v2;
+      Double_t a3=1-v1*v1/(4*v2)-2*v2;
+      Double_t a=0; //
+      if (a1<a) a=a1;  // find analytic minimun to shift
+      if (a2<a) a=a2;  // find analytic minimun to shift
+      if (a3<a) a=a3;  // find analytic minimun to shift
+      f.SetParameter(0,1/(2*TMath::Pi()*(1-a))); // norm
+      f.SetParameter(1,v1);  // v1
+      f.SetParameter(2,v2);  // v2
+      f.SetParameter(3,-a/(2*TMath::Pi()*(1-a))); // shift to have probability
+      f.SetNpx(10000);  // to get a better result when using TF1::GetRandom
+      Double_t phi=f.GetRandom();
+
+
+      //Global polarization parameterization
+
+      Double_t mean_P = (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
+
+      Double_t fEnergyLambda = ULambda.GetMomentum().E();
+      TLorentzVector vec;
+      vec.SetPtEtaPhiE(lambda_pT, lambda_y, phi, fEnergyLambda);
+      ULambda.SetMomentum(vec); //ULambda
+
+
+}
