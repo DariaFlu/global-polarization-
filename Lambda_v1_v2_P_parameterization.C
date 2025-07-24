@@ -1,4 +1,4 @@
-void Lambda_v1_v2_P_parameterization(){
+Double_t Lambda_v1_v2_P_parameterization(){
 
 	double B; // impact parameter
 	double centrality; //centrality for parameterization (b->centrality for Xe+Xe below)
@@ -62,9 +62,9 @@ void Lambda_v1_v2_P_parameterization(){
 
 
       //Global polarization parameterization
+//       double mean_P = (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
 
-      double mean_P = (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
-
+      return (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
 
 
 }

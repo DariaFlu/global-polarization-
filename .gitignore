@@ -11,3 +11,6 @@
 
 #out file
 *.root
+
+/slurm/*
+/lambda_analysis/*
