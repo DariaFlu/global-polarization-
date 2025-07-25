@@ -2,7 +2,7 @@
 #SBATCH -D "/lhep/users/dflusova/lambda/afterburner/v.6/slurm/"
 #SBATCH -J polLambdaAnal
 #SBATCH -p nica
-#SBATCH -a 1-50
+#SBATCH -a 1-100
 #SBATCH --requeue
 #SBATCH --mem=8G
 #SBATCH --time=24:00:00
@@ -49,7 +49,7 @@ START_TIME=$(date +%s)
 # Run the analysis
 root -l -b <<EOF
 .L ${CONFIG_DIR}read_unigen_root.cpp
-simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 1, 5)
+simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 1, 10)
 .q
 EOF
 
