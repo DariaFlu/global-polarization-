@@ -4,9 +4,11 @@
 
 void merger(TString nameInputFile = "result_urqmd_xexe_2.87gev_mf_6195240_") {
     // Define the base path and the tree name
-    TString basePath = "/lhep/users/dflusova/lambda/afterburner/v.6/out/";
+    // TString basePath = "/lhep/users/dflusova/lambda/afterburner/v.6/out/";
+    TString basePath = "/scratch3/dflusova/afterburner/out/";
     TString treeName = "decays";
-    TString outputPath = "/lhep/users/dflusova/lambda/afterburner/v.6/out/processed/";
+    // TString outputPath = "/lhep/users/dflusova/lambda/afterburner/v.6/out/processed/";
+    TString outputPath = "/scratch3/dflusova/afterburner/out/processed/";
 
     //Create directories if they don't exist
     if (gSystem->mkdir(outputPath, true) == -1) {

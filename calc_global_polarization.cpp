@@ -376,7 +376,7 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
             // if(lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() > -0.75 ) hlambdaLabFrame_phiDistrBin[(returnNumberOfBin(lambda_lab.Pt(), fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
             // if (inUEvent->GetB() > fBMin && inUEvent->GetB() < fBMax && lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() > -0.75 ){
             if ( lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() > -0.75 ){
-                std::cout<<"fB = "<<inUEvent->GetB()<<" Y = "<< lambda->GetMomentum().Rapidity()<<std::endl;
+                // std::cout<<"fB = "<<inUEvent->GetB()<<" Y = "<< lambda->GetMomentum().Rapidity()<<std::endl;
                 fProfV2pT->Fill(lambda_lab.Pt(), TMath::Cos(2*positivePhi(lambda->GetMomentum().Phi())));
             }
             // 

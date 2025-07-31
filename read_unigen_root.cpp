@@ -24,10 +24,15 @@
 
 void get_particles(const char* filename, Int_t fPdg);
 void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t flag = 1, Int_t enhanceStat = 1);
-void calc_global_polarization(TString InFileName, TString OutFileName);
-Double_t Lambda_v1_v2_P_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda); //Valeriy's function for properly lambda generation
+void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enhancedFlag = -100);
+void set_lambda_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda); //Valeriy's function for properly lambda generation
 
-Double_t GetRandomValue   (Double_t fMean, Double_t fSigma);
+Double_t get_random_value(Double_t fMean, Double_t fSigma);
+Double_t get_centrality  (Double_t fBVal);
+Double_t get_mean_polarization(Double_t sNN, Double_t centrality);// Value in % 
+Double_t get_V2(Double_t sNN, Double_t centrality, Double_t lambda_pT, Double_t lambda_y);
+
+
 Int_t    returnNumberOfBin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue, Int_t NBins); 
 
 
@@ -360,15 +365,15 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 Double_t eta = gRandom->Uniform(-1, 1);
 
                 TLorentzVector newLambdaPos(
-                    GetRandomValue(0, 0.03),
-                    GetRandomValue(0, 0.03),
-                    GetRandomValue(0, 0.03),
-                    GetRandomValue(0, 0.03));
+                    get_random_value(0, 0.03),
+                    get_random_value(0, 0.03),
+                    get_random_value(0, 0.03),
+                    get_random_value(0, 0.03));
                 TLorentzVector newLambdaMom(
-                    GetRandomValue(pt*cos(phi), 0.03),
-                    GetRandomValue(pt*sin(phi), 0.03),
-                    GetRandomValue(pt*sinh(eta), 0.03),
-                    GetRandomValue(sqrt(pt*pt*cosh(eta)*cosh(eta) + mLambda*mLambda), 0.03)
+                    get_random_value(pt*cos(phi), 0.03),
+                    get_random_value(pt*sin(phi), 0.03),
+                    get_random_value(pt*sinh(eta), 0.03),
+                    get_random_value(sqrt(pt*pt*cosh(eta)*cosh(eta) + mLambda*mLambda), 0.03)
                 );
                 part = new UParticle(i, 3122, 1, 1, 1, -15, -1,
                                     child_null, newLambdaMom, newLambdaPos, 0 );
@@ -381,8 +386,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             //Adding to custom UEvent class:
             outEvent->AddParticle(*part);
             outUEvent->UEvent::AddParticle(*part);
-            Double_t fPolY = Lambda_v1_v2_P_parameterization(Lambda_yield, inEvent->GetB(), lambda);
-
+            // fPolY = set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), lambda); 
+            Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
             outUEvent->AddLambda(&lambda);
 
             // Get Lambda 4-momentum
@@ -466,25 +472,26 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
                 //add random function
                 TLorentzVector mom_rand( //generating momentum
-                    GetRandomValue(part->Px(), 0.03),
-                    GetRandomValue(part->Py(), 0.03),
-                    GetRandomValue(part->Pz(), 0.03),
-                    GetRandomValue(part->E(), 0.03)
+                    get_random_value(part->Px(), 0.03),
+                    get_random_value(part->Py(), 0.03),
+                    get_random_value(part->Pz(), 0.03),
+                    get_random_value(part->E(), 0.03)
                 );
                 
                 TLorentzVector pos_rand( //generating position
-                    GetRandomValue(part->X(), 0.03),
-                    GetRandomValue(part->Y(), 0.03),
-                    GetRandomValue(part->Z(), 0.03),
-                    GetRandomValue(part->T(), 0.03)
+                    get_random_value(part->X(), 0.03),
+                    get_random_value(part->Y(), 0.03),
+                    get_random_value(part->Z(), 0.03),
+                    get_random_value(part->T(), 0.03)
                 );
 
                 UParticle enhancedLambda(*part);
                 enhancedLambda.SetPosition(pos_rand);
                 enhancedLambda.SetMate(enhancedFlag);
 
-                fPolY = Lambda_v1_v2_P_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
-
+                // fPolY = set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+                set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+                fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
                 // Process decay. Same logic
                 TLorentzVector lambda_lab = enhancedLambda.GetMomentum();
                 hLambdaPt->Fill(lambda_lab.Pt());
@@ -593,8 +600,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 }
 
 
-
-void calc_global_polarization(TString InFileName, TString OutFileName){
+void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enhancedFlag){
     gStyle->SetOptStat(0);  // Disable stats globally
     TF1* fitPhiDistro = new TF1("fitPhiDistro", "[0]*(1+2*[1]*TMath::Sin(x)+2*[2]*TMath::Cos(x))", 0, 2*TMath::Pi()); //Fitting function
     // TF1* fitPhiDistro = new TF1("fitPhiDistro", 
@@ -621,6 +627,9 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
     TProfile* fProfV2pT = new TProfile("fProfV2pT", "v_{2} vs pT", 20, 0, 2, -10, 10);
     TProfile* fProfV1Y = new TProfile("fProfV1Y", "v_{1} vs Y", 20, -1, 1, -2, 2);
 
+    TH1D* hPsiEP = new TH1D("hPsiEP","hPsiEP ; #Psi_{EP}; Counts",100, -TMath::Pi(), TMath::Pi());
+    TH2D* hQvector = new TH2D("hQvector", "Q-vector Components", 100, -100, 100, 100, -100, 100);
+    TH1D* hResolution = new TH1D("hResolution","hResolution", 100,-1, 1);
     // Set axis titles
     fProfV2pT->GetYaxis()->SetTitle("v_{2}");
     fProfV2pT->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -650,20 +659,47 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
     // Setup branches
     UUEvent *inUEvent = new UUEvent();
     inTree->SetBranchAddress("user_event", &inUEvent);
-    Double_t fBMin = 3.44;
-    Double_t fBMax = 6.64;
+    // Double_t fBMin = 3.44;
+    // Double_t fBMax = 6.64;
+    Double_t fCenMin = 10;//%
+    Double_t fCenMax = 40;//%
+    Double_t n = 2; //harmonic
     //Loop over events
     Long64_t nEvents = inTree->GetEntries();
     for (Long64_t iEvent = 0; iEvent < nEvents; iEvent++) {
         inUEvent->Clear();
         inTree->GetEntry(iEvent);
+        Int_t flagMult = enhancedFlag;
+        // std::cout<<"Event No"<<iEvent<<std::endl;
+        Int_t lambdaCounter = 0;
+        Double_t Qx = 0, Qy = 0;
+        Double_t QxA = 0, QyA = 0, QxB = 0, QyB = 0;
         //Loop over particles within event
         for (Int_t iPart = 0; iPart < inUEvent->GetNLambdas();iPart++) {
-            if(inUEvent->GetBimp() < fBMin || inUEvent->GetBimp() > fBMax) continue;
+            // if(inUEvent->GetBimp() < fBMin || inUEvent->GetBimp() > fBMax) continue;
+            if(get_centrality(inUEvent->GetBimp()) < fCenMin || get_centrality(inUEvent->GetBimp()) > fCenMax) continue;
+
             if(!inUEvent->GetLambda(iPart)) continue;
+
             lambda = inUEvent->GetLambda(iPart); //lambda in laboratory frame
             proton = inUEvent->GetProton(iPart); //proton in lambda frame
             pion   = inUEvent->GetPion(iPart);   //pion   in lambda frame
+            // if(lambda.GetMate() == -15) continue;
+
+            if(flagMult == 0 && enhancedFlag > 0) continue;
+            if(lambda->GetMate() == -9 && flagMult != 0) flagMult--;
+
+            Qx += TMath::Cos(n * lambda->GetMomentum().Phi());
+            Qy += TMath::Sin(n * lambda->GetMomentum().Phi());
+            hQvector->Fill(Qx,Qy);
+            if(lambda->GetMomentum().Rapidity() > 0 ){
+                QxA+=TMath::Cos(n * lambda->GetMomentum().Phi());
+                QyA+=TMath::Cos(n * lambda->GetMomentum().Phi());
+            }
+            else{
+                QxB+=TMath::Cos(n * lambda->GetMomentum().Phi());
+                QyB+=TMath::Cos(n * lambda->GetMomentum().Phi());
+            }
 
             Double_t phiStar = positivePhi(proton->GetMomentum().Phi()); //Get phi*
             hProtonLambdaFrame_phi->Fill(phiStar); //phi* distribution 
@@ -684,24 +720,25 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
             hLambdaLabFrame_pT->Fill(lambda_lab.Pt());
             hlambdaLabFrame_Y ->Fill(lambda_lab.Rapidity());
             hlambdaLabFrame_phiDistr->Fill(positivePhi(lambda->GetMomentum().Phi()));
-            // if(lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() > -0.75 ) hlambdaLabFrame_phiDistrBin[(returnNumberOfBin(lambda_lab.Pt(), fpTMin, fpTMax, NpTBins))]->Fill(phiStar); 
-            //std::cout << "Cos[2 phi]: " << TMath::Cos(2*positivePhi(lambda->GetMomentum().Phi())) << std::endl;
-            Double_t value = (TMath::Power(lambda_lab.Px(), 2) - TMath::Power(lambda_lab.Py(), 2))/TMath::Power(lambda_lab.Pt(), 2);
-            Double_t valPhi = TMath::Cos(2*(lambda_lab.Phi()));
-            //if (lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() < 0.75 ) fProfV2pT->Fill(lambda_lab.Pt(), TMath::Cos(2*positivePhi(lambda->GetMomentum().Phi())));
-            if (lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() < 0.75 ){
-                fProfV2pT->Fill(lambda_lab.Pt(), valPhi);
-                std::cout << fProfV2pT->GetYmin() << " " << fProfV2pT->GetYmax() << " " << TMath::Cos(2*(lambda_lab.Phi())) << std::endl;
-            }
+            if (lambda->GetMomentum().Rapidity() > -0.75 && lambda->GetMomentum().Rapidity() < 0.75 ){ fProfV2pT->Fill(lambda_lab.Pt(), TMath::Cos(2*(lambda_lab.Phi())));}
+            // if (lambda->GetMomentum().Pt() > 0.4 && lambda->GetMomentum().Pt() < 2.) fProfV1Y->Fill(lambda_lab.Rapidity(),TMath::Cos(positivePhi(lambda->GetMomentum().Phi())));
+            if (lambda->GetMomentum().Pt() > 0.4 && lambda->GetMomentum().Pt() < 2.) fProfV1Y->Fill(lambda_lab.Rapidity(),TMath::Cos(positivePhi(lambda_lab.Phi())));
 
-            if (lambda->GetMomentum().Pt() > 0.4 && lambda->GetMomentum().Pt() < 2.) fProfV1Y->Fill(lambda_lab.Rapidity(),TMath::Cos(positivePhi(lambda->GetMomentum().Phi())));
-            
-
-
+            lambdaCounter++;
+            // std::cout<<"lambdaCounter "<<lambdaCounter<<std::endl;
 
         }
+        // std::cout<<"number of lambda within event "<<lambdaCounter<<std::endl;
+        Double_t Psi_n = (1./n) * TMath::ATan2(Qy, Qx);
+        Double_t Psi_A = (1./n) * TMath::ATan2(QyA, QxA);
+        Double_t Psi_B = (1./n) * TMath::ATan2(QyB, QxB);
+        Double_t resolution = TMath::Sqrt(TMath::Cos(n * (Psi_A - Psi_B)));
 
+        // std::cout<<"Psi = "<<Psi_n<<std::endl;
+        hPsiEP->Fill(Psi_n);
+        hResolution->Fill(resolution);
     }
+
     //--pT binning--//
     TH1D* hphi_pTBins= new TH1D("hphi_pTBins", " p_{T} binning; p_{T}, GeV/c; P_{#lambda} %", NpTBins,  fpTMin, fpTMax); // Histogram with pT bins
     for(Int_t iHisto = 0; iHisto < NpTBins; iHisto++) { //Loop over pT bins
@@ -735,31 +772,67 @@ void calc_global_polarization(TString InFileName, TString OutFileName){
     lProtonLambdaFrame_phi->SetTextSize(0.05); 
     lProtonLambdaFrame_phi->SetBorderSize(0);   
     lProtonLambdaFrame_phi->AddEntry("", Form("p_{1} = %.3f #pm %.3f", fitPhiDistro->GetParameter(1), fitPhiDistro->GetParError(1)), "");
-    lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = %.0f #pm %.0f %%", (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy)*100, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)*100), "");
+    lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = %.2f #pm %.2f %%", (fitPhiDistro->GetParameter(1)*8)/(TMath::Pi()*anisotropy)*100, (fitPhiDistro->GetParError(1)*8)/(TMath::Pi()*anisotropy)*100), "");
     lProtonLambdaFrame_phi->AddEntry("", Form("P_{#Lambda} = (8p_{1}) / (%.3f#pi)", anisotropy), "");
 
     // Plot results
-    TCanvas *c1 = new TCanvas("c1", "proton", 1200, 800);
-    c1->Divide(2,2);
-    c1->cd(1); hProtonLambdaFrame_phi->Draw(); lProtonLambdaFrame_phi->Draw("same");
-    c1->cd(2); hLambdaLabFrame_pT->Draw();
-    c1->cd(3); hphi_pTBins->Draw("PE");
-    c1->cd(4); hphi_YBins->Draw("PE");
+    TCanvas *cProton = new TCanvas("cProton", "proton", 1200, 800);
+    cProton->Divide(2,2);
+    cProton->cd(1); hProtonLambdaFrame_phi->Draw(); lProtonLambdaFrame_phi->Draw("same");
+    cProton->cd(2); hLambdaLabFrame_pT->Draw();
+    cProton->cd(3); hphi_pTBins->Draw("PE");
+    cProton->cd(4); hphi_YBins->Draw("PE");
 
-    c1->SaveAs("proton_polarization_plots.png");
-    c1->Write();
+    // cProton->SaveAs("proton_polarization_plots.png");
+    cProton->SaveAs((enhancedFlag > -1 ) ? TString::Format("picture/proton_polarization_plots_%i.png",enhancedFlag) : "picture/proton_polarization_plots.png");
+    cProton->Write();
     hLambdaLabFrame_pT->Write();
     hlambdaLabFrame_Y->Write();
     hProtonLambdaFrame_phi->Write();
     hlambdaLabFrame_phiDistr->Fit(fitPhiCollectiveFlowDistro);
     hlambdaLabFrame_phiDistr->Write();
+    TCanvas *cCollectiveFlow = new TCanvas("cCollectiveFlow", "cCollectiveFlow", 1200, 800);
+    hlambdaLabFrame_phiDistr->Draw();
+    // Get fit parameters
+    double v2 = fitPhiCollectiveFlowDistro->GetParameter(1);
+    double v2_error = fitPhiCollectiveFlowDistro->GetParError(1);
+    double constant = fitPhiCollectiveFlowDistro->GetParameter(0);
+    double constant_error = fitPhiCollectiveFlowDistro->GetParError(0);
+
+    TLegend *llambdaLabFrame_phiDistr = new TLegend(0.7, 0.7, 0.89, 0.89);
+    llambdaLabFrame_phiDistr->AddEntry(fitPhiCollectiveFlowDistro, Form("v_{2} = %.3f #pm %.3f", v2, v2_error), "l");
+    llambdaLabFrame_phiDistr->SetBorderSize(0);   
+    llambdaLabFrame_phiDistr->Draw("same");
+
+    cCollectiveFlow->SaveAs((enhancedFlag > -1 ) ? TString::Format("picture/lambda_collective_flow_%i.png",enhancedFlag) : "picture/lambda_collective_flow.png");
     fProfV2pT->Write();
     fProfV1Y->Write();
+    hPsiEP->Write();
+    hQvector->Write();
+    hResolution->Write();
     outFile->Close();
     inFile->Close();
+    // std::cout<<"Close() "<<std::endl;
+
+    // std::cout<<"delete 1"<<std::endl;
+
+    delete hLambdaLabFrame_pT; delete hlambdaLabFrame_Y; delete hlambdaLabFrame_phiDistr; delete hProtonLambdaFrame_phi; delete fProfV1Y; delete hPsiEP; delete hQvector; delete fProfV2pT;//delete hProtonLambdaFrame_phi_YBins; delete hProtonLambdaFrame_phi_pTBins;
+    // delete hResolution;
+    // std::cout<<"delete 2"<<std::endl;
+
+    for(TH1D* histo : hProtonLambdaFrame_phi_pTBins) delete histo;
+    for(TH1D* histo : hProtonLambdaFrame_phi_YBins ) delete histo;
+    // for(TH1D* histo : hlambdaLabFrame_phiDistrBin  ) delete histo;
+    // std::cout<<"delete 3"<<std::endl;
+
+    delete cCollectiveFlow; delete cProton;
+
+    // std::cout<<"delete 4"<<std::endl;
+
+
 }
 
-Double_t GetRandomValue(Double_t fMean, Double_t fSigma)
+Double_t get_random_value(Double_t fMean, Double_t fSigma)
 {
     TRandom3* rand = new TRandom3(0);  // Seed with 0 for reproducibility
     Double_t randomVal = rand->Gaus(fMean, fSigma);
@@ -781,77 +854,175 @@ Int_t returnNumberOfBin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     return (bin < NBins) ? bin : NBins-1;
 }
 
-Double_t Lambda_v1_v2_P_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda){ //Valeriy's function for properly lambda generation
+    void set_lambda_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda){ //Valeriy's function for properly lambda generation
 
-	Double_t centrality; //centrality for parameterization (b->centrality for Xe+Xe below)
+
+	Double_t centrality = get_centrality(fBVal); //centrality for parameterization (b->centrality for Xe+Xe below)
 	Double_t sNN = 2.87; // Energy of the collision in center-of-mass system
-	if(fBVal<3.44)
-                centrality=5;
-        else if(fBVal<4.88)
-                centrality=15;
-        else if(fBVal<5.84)
-                centrality=25;
-        else if(fBVal<6.64)
-                centrality=35;
-        else if(fBVal<7.44)
-                centrality=45;
-        else if(fBVal<8.08)
-                centrality=55;
-        else if(fBVal<8.72)
-                centrality=65;
-        else if(fBVal<9.36)
-                centrality=75;
-        else if(fBVal<9.84)
-                centrality=85;
-        else
-                centrality=95;
 
-
-	// TFile* Lambda_yield = new TFile("/lhep/users/dflusova/lambda/afterburner/v.6/qa_out_xexe.root","read"); // File with TH2F pt-y
 	TH2F* h_pt_y;
-	if(centrality<10)
-		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT010");
-	else if(centrality>10 && centrality <40)
-		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT");
-	else
-		h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT40100");
+	if(centrality<10) h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT010");
+	else if(centrality>10 && centrality <40) h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT");
+	else h_pt_y = (TH2F*) Lambda_yield->Get("h2PartYpT40100");
 
 
-        Double_t lambda_pT; // pT of Lambda from pT-y TH2F
+    Double_t lambda_pT; // pT of Lambda from pT-y TH2F
 	Double_t lambda_y;  // rapidity of Lambda from pT-y TH2F
 
 	h_pt_y->GetRandom2(lambda_y,lambda_pT);
 
-	Double_t v1 = (28.8635/(TMath::Power(sNN,2.89092))) * (  (-0.0233*centrality+0.5413* TMath::Power(centrality,1./3) ) * (163.536/18.0188 - 163.536/(lambda_pT +18.0188) )* lambda_y + ( -0.0056*centrality+0.377*TMath::Power(centrality,1./3) ) * (0.6653* lambda_pT - 0.6172 * TMath::Power(lambda_pT,2) +0.1154 * TMath::Power(lambda_pT,3) ) * TMath::Power(lambda_y,3) ); // v1 cent-pT-y func
-	Double_t v2 = 0.07; //uniform distribution
+	Double_t v1 = (28.8635/(TMath::Power(sNN,2.89092))) 
+                * ((-0.0233*centrality+0.5413* TMath::Power(centrality,1./3) ) 
+                * (163.536/18.0188 - 163.536/(lambda_pT +18.0188) )* lambda_y + ( -0.0056*centrality+0.377*TMath::Power(centrality,1./3) ) 
+                * (0.6653* lambda_pT - 0.6172 * TMath::Power(lambda_pT,2) +0.1154 * TMath::Power(lambda_pT,3) ) * TMath::Power(lambda_y,3) ); // v1 cent-pT-y func
+    // Double_t v2 = 0.07; //uniform distribution
+    Double_t v2 = get_V2(sNN, centrality, lambda_pT, lambda_y);
+    // std::cout<<"================ "<<v2<<std::endl;
+    // if(v2 == 0) v2 =0.07;
+    if( v1  > 1 )  v1 =1;
+    else if(v1<-1) v1=-1
+    // if( v2  > 1 ) v2 =1;
+    // std::cout<<" v2 value =  "<<v2<<std::endl;
+    // generate phi according to v1 and v2
+    static TF1 f("f", "[0]*(1+2*[1]*TMath::Cos(x)+2*[2]*TMath::Cos(2*x))+[3]", 0,2*TMath::Pi());
+    Double_t a1=1+2*v1+2*v2;
+    Double_t a2=1-2*v1+2*v2;
+    Double_t a3=1-v1*v1/(4*v2)-2*v2;
+    Double_t a=0; //
+    if (a1<a) a=a1;  // find analytic minimun to shift
+    if (a2<a) a=a2;  // find analytic minimun to shift
+    if (a3<a) a=a3;  // find analytic minimun to shift
+    f.SetParameter(0,1/(2*TMath::Pi()*(1-a))); // norm
+    f.SetParameter(1,v1);  // v1
+    f.SetParameter(2,v2);  // v2
+    f.SetParameter(3,-a/(2*TMath::Pi()*(1-a))); // shift to have probability
+    f.SetNpx(10000);  // to get a better result when using TF1::GetRandom
+    Double_t phi=f.GetRandom();
 
-    if( v1  > 1 ) v1 =1;
-	// generate phi according to v1 and v2
-      static TF1 f("f", "[0]*(1+2*[1]*TMath::Cos(x)+2*[2]*TMath::Cos(2*x))+[3]", 0,2*TMath::Pi());
-      Double_t a1=1+2*v1+2*v2;
-      Double_t a2=1-2*v1+2*v2;
-      Double_t a3=1-v1*v1/(4*v2)-2*v2;
-      Double_t a=0; //
-      if (a1<a) a=a1;  // find analytic minimun to shift
-      if (a2<a) a=a2;  // find analytic minimun to shift
-      if (a3<a) a=a3;  // find analytic minimun to shift
-      f.SetParameter(0,1/(2*TMath::Pi()*(1-a))); // norm
-      f.SetParameter(1,v1);  // v1
-      f.SetParameter(2,v2);  // v2
-      f.SetParameter(3,-a/(2*TMath::Pi()*(1-a))); // shift to have probability
-      f.SetNpx(10000);  // to get a better result when using TF1::GetRandom
-      Double_t phi=f.GetRandom();
+    Double_t fEnergyLambda = ULambda.GetMomentum().E();
+    TLorentzVector vec;
+    vec.SetPtEtaPhiE(lambda_pT, lambda_y, phi, fEnergyLambda);
+    ULambda.SetMomentum(vec); //ULambda
 
-
-      //Global polarization parameterization
-
-    //   Double_t mean_P = (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
-
-      Double_t fEnergyLambda = ULambda.GetMomentum().E();
-      TLorentzVector vec;
-      vec.SetPtEtaPhiE(lambda_pT, lambda_y, phi, fEnergyLambda);
-      ULambda.SetMomentum(vec); //ULambda
-
-      return (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); // Value in % 
 
 }
+
+
+Double_t get_V2(Double_t sNN, Double_t centrality, Double_t lambda_pT, Double_t lambda_y) {
+
+	// Double_t v2 = 1.05*(0.8132-11.4/TMath::Power(sNN,2.1)) 
+    //                   *((-0.01105*centrality + 0.000162*TMath::Power(centrality,2) )/(-0.01105*25 + 0.000162*TMath::Power(25,2) )) 
+    //                   *(-1) * ( (0.32172*TMath::Power(lambda_y,1.805)-0.1578)*lambda_pT + (0.05838*TMath::Power(lambda_y,3.2172) - 0.0179)
+    //                   *TMath::Exp(lambda_pT*(1.4562*TMath::Power(lambda_y,3.28814) + 0.22912))
+    //                   *TMath::Sin(lambda_pT*(-1.004*TMath::Power(lambda_y,4.6398) + 3.88097)+(-3.6075*TMath::Power(lambda_y,4.6582) + 3.35966))); //v2 snn-cent-pT-y func
+    // if (sNN <= 0 || centrality < 0 || lambda_pT < 0 || lambda_y < 0) return 0.;  // or throw an error
+    lambda_y = TMath::Abs(lambda_y);
+    
+    // =============================================
+    // 1. Energy-dependent term (depends on sNN)
+    // =============================================
+    Double_t energy_term = 1.05 * (0.8132 - 11.4 / TMath::Power(sNN, 2.1));
+
+    // =============================================
+    // 2. Centrality-dependent term (normalized at centrality=25)
+    // =============================================
+    Double_t centrality_numerator = 
+        -0.01105 * centrality + 0.000162 * TMath::Power(centrality, 2);
+    Double_t centrality_denominator = 
+        -0.01105 * 25 + 0.000162 * TMath::Power(25, 2);
+    Double_t centrality_term = centrality_numerator / centrality_denominator;
+
+    // =============================================
+    // 3. Sign flip (-1 factor)
+    // =============================================
+    Double_t sign_flip = -1;
+
+    // =============================================
+    // 4. Rapidity (lambda_y) and pT (lambda_pT) dependent term
+    // =============================================
+    // 4a. Linear term in lambda_pT (depends on lambda_y)
+    Double_t linear_pT_term = 
+        (0.32172 * TMath::Power(lambda_y, 1.805) - 0.1578) * lambda_pT;
+
+    // 4b. Nonlinear term (exponential + sinusoidal dependence)
+    Double_t exp_argument = 
+        lambda_pT * (1.4562 * TMath::Power(lambda_y, 3.28814) + 0.22912);
+    Double_t sin_phase = 
+        lambda_pT * (-1.004 * TMath::Power(lambda_y, 4.6398) + 3.88097) 
+        + (-3.6075 * TMath::Power(lambda_y, 4.6582) + 3.35966);
+    
+    Double_t nonlinear_term = 
+        (0.05838 * TMath::Power(lambda_y, 3.2172) - 0.0179) 
+        * TMath::Exp(exp_argument) 
+        * TMath::Sin(sin_phase);
+
+    // Combine all terms into final v2 expression
+    Double_t v2 = 
+        energy_term 
+        * centrality_term 
+        * sign_flip 
+        * (linear_pT_term + nonlinear_term);
+
+    // std::cout << "ERROR: NaN in nonlinear_term. Args: "
+    //     << "exp_argument=" << exp_argument << ", sin_phase=" << sin_phase <<" , centrality_denominator = " << centrality_denominator << std::endl;
+
+    // if (TMath::Abs(centrality_denominator) < 1e-10) {
+    //     return 0.;  // Avoid division by zero
+    // }
+
+    // if (TMath::IsNaN(nonlinear_term)) {
+    //     std::cout << "ERROR: NaN in nonlinear_term. Args: "
+    //                 << "exp_argument=" << exp_argument << ", sin_phase=" << sin_phase << std::endl;
+    // }
+    // if (!TMath::Finite(sin_phase)) {
+    //     return 0.;
+    // }
+
+    return v2;
+
+}
+
+Double_t get_mean_polarization(Double_t sNN, Double_t centrality){ return (2.8569/ TMath::Power(sNN,0.955513) ) * (2.4702 - 0.0461*centrality + 0.0042 * TMath::Power(centrality, 2)); }// Value in % 
+
+Double_t get_centrality(Double_t fBVal){
+    if(fBVal<3.44) {return 5;}
+    else if(fBVal<4.88) {return 15;}
+    else if(fBVal<5.84) {return 25;}
+    else if(fBVal<6.64) {return 35;}
+    else if(fBVal<7.44) {return 45;}
+    else if(fBVal<8.08) {return 55;}
+    else if(fBVal<8.72) {return 65;}
+    else if(fBVal<9.36) {return 75;}
+    else if(fBVal<9.84) {return 85;}
+    else {return 95;}
+}
+
+// Double_t GetSubEventPlane(Int_t harmonic, const TClonesArray* particles, Bool_t isFirstSubEvent) {
+//     Double_t Qx = 0., Qy = 0.;
+//     Int_t count = 0;
+    
+//     // Random splitting seed for reproducibility
+//     TRandom3 rand(particles->GetEntries() + (isFirstSubEvent ? 0 : 1));
+    
+//     for (Int_t i = 0; i < particles->GetEntriesFast(); i++) {
+//         UParticle* part = (UParticle*)particles->At(i);
+        
+//         // Apply standard selection cuts
+//         if (part->GetCharge() == 0) continue;                     // Neutral particles
+//         if (TMath::Abs(part->Eta()) > 1.0) continue;              // η cut
+//         if (part->Pt() < 0.2 || part->Pt() > 2.0) continue;       // pT range
+        
+//         // Randomly assign to sub-events (50/50 split)
+//         if (rand.Rndm() > 0.5) continue;                          // Skip for second sub-event
+//         if (!isFirstSubEvent && rand.Rndm() <= 0.5) continue;     // Skip for first sub-event
+        
+//         Qx += TMath::Cos(harmonic * part->Phi());
+//         Qy += TMath::Sin(harmonic * part->Phi());
+//         count++;
+//     }
+    
+//     // Protection against low multiplicity
+//     if (count < 5) return -999.; 
+    
+//     return (1./harmonic) * TMath::ATan2(Qy, Qx);
+// }

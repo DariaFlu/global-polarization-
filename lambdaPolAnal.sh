@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH -D "/lhep/users/dflusova/lambda/afterburner/v.6/slurm/"
+#SBATCH -D "/scratch3/dflusova/afterburner/slurm"
 #SBATCH -J polLambdaAnal
 #SBATCH -p nica
-#SBATCH -a 1-100
+#SBATCH -a 1-2000
 #SBATCH --requeue
 #SBATCH --mem=8G
 #SBATCH --time=24:00:00
-#SBATCH --exclude=ncx112,ncx115,ncx117,ncx121,ncx147,ncx153,ncx156,ncx158,ncx159,ncx171,ncx181,ncx184,ncx207,ncx214,ncx216,ncx222,ncx223,ncx224,ncx225,ncx227
+#SBATCH --exclude=ncx111,ncx112,ncx113,ncx114,ncx115,ncx116,ncx117,ncx121,ncx122,ncx123,ncx124,ncx125,ncx126,ncx127,ncx132,ncx138,ncx142,ncx143,ncx144,ncx145,ncx146,ncx147,ncx148,ncx150,ncx151,ncx152,ncx153,ncx154,ncx155,ncx156,ncx157,ncx158,ncx159,ncx160,ncx161,ncx162,ncx163,ncx164,ncx165,ncx166,ncx167,ncx168,ncx169,ncx170,ncx171,ncx172,ncx174,ncx175,ncx176,ncx177,ncx180,ncx181,ncx182,ncx184,ncx185,ncx186,ncx187,ncx188,ncx203,ncx206,ncx207,ncx208,ncx211,ncx212,ncx213,ncx214,ncx215,ncx216,ncx217,ncx222,ncx223,ncx224,ncx225,ncx226,ncx227,ncx228
 
 # Load necessary environment
 source /cvmfs/nica.jinr.ru/sw/os/login.sh latest
@@ -20,7 +20,8 @@ export TASK_ID=${SLURM_ARRAY_TASK_ID}
 # Define paths (modify these as needed)
 INPUT_DIR="/eos/nica/mpd/users/parfenov/SimData/UrQMD/xexe_2.87gev_mf/6195240/files/mcini/"
 CONFIG_DIR="/lhep/users/dflusova/lambda/afterburner/v.6/"
-OUTPUT_DIR="/lhep/users/dflusova/lambda/afterburner/v.6/out/"
+# OUTPUT_DIR="/lhep/users/dflusova/lambda/afterburner/v.6/out/"
+OUTPUT_DIR="/scratch3/dflusova/afterburner/out/"
 
 # Wait for CVMFS and EOS to be available
 for i in {1..5}; do
@@ -49,7 +50,7 @@ START_TIME=$(date +%s)
 # Run the analysis
 root -l -b <<EOF
 .L ${CONFIG_DIR}read_unigen_root.cpp
-simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 1, 10)
+simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 1, 50)
 .q
 EOF
 
