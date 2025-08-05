@@ -553,7 +553,7 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
     Double_t fpTMax = 2.0;//GeV/C
     Double_t fYmin = -0.75;
     Double_t fYmax = 0.75;
-    Double_t n = 2; //harmonic
+    Double_t n = 2.0; //harmonic
     //Loop over events
     // Long64_t nEvents = inTree->GetEntries();
     Long64_t nEvents = inChain->GetEntries();
@@ -564,10 +564,10 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
         // inTree->GetEntry(iEvent);
         inChain->GetEntry(iEvent);
 
-        //std::cout<<"Event No"<<iEvent<<std::endl;
+        // std::cout<<"Event No"<<iEvent<<std::endl;
         // std::cout << "vector size: " << vecPolarization->size() << std::endl;
-        //std::cout<<"vecPolarization->at(iTrack).X()"<<std::endl;
-        //std::cout<<vecPolarization->at(0).X()<<std::endl;
+        // std::cout<<"vecPolarization->at(iTrack).X()"<<std::endl;
+        // std::cout<<vecPolarization->at(0).X()<<std::endl;
 
         Int_t lambdaCounter = 0;
         Double_t Qx = 0, Qy = 0;
@@ -581,8 +581,10 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
             // if (ULambda->at(iTrack).GetMomentum().Rapidity() < fYmin  || ULambda->at(iTrack).GetMomentum().Rapidity() > fYmax ) continue;
             // if (ULambda->at(iTrack).GetMomentum().Pt()       < fpTMin || ULambda->at(iTrack).GetMomentum().Pt()       > fpTMax) continue;
             
-            Qx += TMath::Cos(n * lambda->GetMomentum().Phi());
-            Qy += TMath::Sin(n * lambda->GetMomentum().Phi());
+            // Qx += TMath::Cos(n * lambda->GetMomentum().Phi());
+            // Qy += TMath::Sin(n * lambda->GetMomentum().Phi());
+            Qx += TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
+            Qy += TMath::Sin(n * ULambda->at(iTrack).GetMomentum().Phi());
             hQvector->Fill(Qx,Qy);
             if(ULambda->at(iTrack).GetMomentum().Rapidity() > 0 ){
                 QxA+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
@@ -593,7 +595,7 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
                 QyB+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
             }
 
-            Double_t phiStar = get_positive_phi(fPsi-UProton->at(iTrack).GetMomentum().Phi()); //Get phi*
+            Double_t phiStar = get_positive_phi(UProton->at(iTrack).GetMomentum().Phi()); //Get phi*
             hProtonLambdaFrame_phi->Fill(phiStar); //phi* distribution 
 
             //if bin isn't uderflow or overflow then put phi*-distribution in histogram[number of bin]
@@ -604,15 +606,23 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
             //Filling pT and Y histograms
             hLambdaLabFrame_pT->Fill(ULambda->at(iTrack).GetMomentum().Pt());
             hlambdaLabFrame_Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity());
-            hlambdaLabFrame_phiDistr->Fill(get_positive_phi(fPsi-ULambda->at(iTrack).GetMomentum().Phi()));
-            if (lambda->GetMomentum().Rapidity() > fYmin  && lambda->GetMomentum().Rapidity() < fYmax ) fProfV2pT->Fill(ULambda->at(iTrack).GetMomentum().Pt(),      TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())));
-            if (lambda->GetMomentum().Pt()       > fpTMin && lambda->GetMomentum().Pt()       < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(fPsi-ULambda->at(iTrack).GetMomentum().Phi())));
+            hlambdaLabFrame_phiDistr->Fill(get_positive_phi(ULambda->at(iTrack).GetMomentum().Phi()));
+            //std::cout << "ymin:" << fYmin << " ymax: " << fYmax << " Y: " << lambda->GetMomentum().Rapidity() << std::endl;
+            // if (lambda->GetMomentum().Rapidity() > fYmin  && lambda->GetMomentum().Rapidity() < fYmax ){
+            //     std::cout << "Pt " << ULambda->at(iTrack).GetMomentum().Pt() << " CosPhi " << TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())) << std::endl;
+            //      fProfV2pT->Fill(ULambda->at(iTrack).GetMomentum().Pt(),      TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())));
+            // }
+            // if (lambda->GetMomentum().Pt()       > fpTMin && lambda->GetMomentum().Pt()       < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(fPsi-ULambda->at(iTrack).GetMomentum().Phi())));
+            if (ULambda->at(iTrack).GetMomentum().Rapidity() > fYmin  && ULambda->at(iTrack).GetMomentum().Rapidity() < fYmax ) fProfV2pT->Fill(ULambda->at(iTrack).GetMomentum().Pt(),      TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())));
+            if (ULambda->at(iTrack).GetMomentum().Pt()      > fpTMin && ULambda->at(iTrack).GetMomentum().Pt()        < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(ULambda->at(iTrack).GetMomentum().Phi())));
+           
             lambdaCounter++;
         }
         //std::cout<<"number of lambda within event "<<lambdaCounter<<std::endl;
         Double_t Psi_n = (1./n) * TMath::ATan2(Qy, Qx);
         Double_t Psi_A = (1./n) * TMath::ATan2(QyA, QxA);
         Double_t Psi_B = (1./n) * TMath::ATan2(QyB, QxB);
+        //std::cout << "res: " << Psi_A << " " <<  Psi_B << std::endl;
         Double_t resolution = TMath::Sqrt(TMath::Cos(n * (Psi_A - Psi_B)));
 
         // std::cout<<"Psi = "<<Psi_n<<std::endl;
@@ -953,7 +963,7 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
 
     // std::cout<<"polmag =  "<<polmag<<std::endl;
 
-    // std::cout<<"Polarization generated (X,Y,Z) "<<polarizationVec.X()<<" "<<polarizationVec.Y()<<" "<<polarizationVec.Z()<<std::endl;
+    //std::cout<<"Polarization generated (X,Y,Z) "<<polarizationVec.X()<<" "<<polarizationVec.Y()<<" "<<polarizationVec.Z()<<std::endl;
     return polarizationVec;
 }
 
