@@ -32,17 +32,21 @@ void lambdaPolAnal() {
 
     TString OutFileName = "result_global_polarization_urqmd_xexe_2.87gev_mf_6195240.mcini.root"; //resulting .root file, it contains deltaPhi distributions
 
-    Int_t nFile = 2; //number of input file
+    Int_t nFile = 4; //number of input file
     Int_t enhancedValue = 2; //number of enhanced lambdass
 
     for(Int_t iFile = 1; iFile < nFile; ++iFile){// Uncomment the loop if it is needed for proton production
         //Notice! simulate_lambda_decays() produced protons and pions in lambda state frame! 
         //In the output file lambda in laboratory frame   
-        simulate_lambda_decays(TString::Format("%surqmd_xexe_2.87gev_mf_6195240_%i.mcini.root", pathIn.Data(), iFile), 
-                                TString::Format("%s%s",pathOut.Data(),fileOut.Data()),
-                                TString::Format("%s%s",pathConf.Data(),fileConfIn.Data()), 
-                                iFile, enhancedValue);
+        std::cout << "File No. " << iFile << std::endl;
+        if(!(TFile::Open(TString::Format("%surqmd_xexe_2.87gev_mf_6195240_%i.mcini.root", pathIn.Data(), iFile), "READ")->IsZombie())){
+            simulate_lambda_decays(TString::Format("%surqmd_xexe_2.87gev_mf_6195240_%i.mcini.root", pathIn.Data(), iFile), 
+                                    TString::Format("%s%s",pathOut.Data(),fileOut.Data()),
+                                    TString::Format("%s%s",pathConf.Data(),fileConfIn.Data()), 
+                                    enhancedValue);
+        }
     }
+    std::cout << "calc polar " << std::endl;
     //Polarization proccesing 
     calc_global_polarization(TString::Format("%s%s",pathOut.Data(), fileOut.Data()),  TString::Format("%s%s",pathOut.Data(), OutFileName.Data()));
 

@@ -23,9 +23,15 @@ The afterburner is intended to work with UrQMD generated data in unigen format.
 
 ## Usage
 
+First run root with commands:
+```bash
+gInterpreter->GenerateDictionary("vector<UParticle>", "vector;UParticle.h");
+gInterpreter->GenerateDictionary("vector<TVector3>", "vector;TVector3.h");
+
 ```bash
 # Example usage of functions
 root -l -q 'simulate_lambda_decays.C("input.root", "output.root")'
 root -l -q 'calc_global_polarization.C("output.root", "results.root")'
 # Example usage of main macro
 root -l -q 'root -x -q -b lambdaPolAnal.cpp'
+root -l -q 'root -x -q -b lambdaPolCalc.cpp'

@@ -1,0 +1,102 @@
+   ------------------------------------------------------------------
+  | Welcome to ROOT 6.32.06                        https://root.cern |
+  | (c) 1995-2024, The ROOT Team; conception: R. Brun, F. Rademakers |
+  | Built for linuxx8664gcc on Sep 24 2024, 09:30:23                 |
+  | From tags/6-32-06@6-32-06                                        |
+  | With c++ (GCC) 13.2.0                                            |
+  | Try '.help'/'.?', '.demo', '.license', '.credits', '.quit'/'.q'  |
+   ------------------------------------------------------------------
+
+
+Processing lambdaPolCalc.cpp...
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+entries size: 0
+ROOT file saved and closed.
+Analysis complete! Results saved to lambda_polarization_results.root
