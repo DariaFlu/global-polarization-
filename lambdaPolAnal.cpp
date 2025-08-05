@@ -32,8 +32,11 @@ void lambdaPolAnal() {
 
     TString OutFileName = "result_global_polarization_urqmd_xexe_2.87gev_mf_6195240.mcini.root"; //resulting .root file, it contains deltaPhi distributions
 
-    Int_t nFile = 4; //number of input file
+    Int_t nFile = 2; //number of input file
     Int_t enhancedValue = 2; //number of enhanced lambdass
+
+    gSystem->Load("AutoDict_vector_TVector3__cxx.so");
+    gSystem->Load("AutoDict_vector_UParticle__cxx.so");
 
     for(Int_t iFile = 1; iFile < nFile; ++iFile){// Uncomment the loop if it is needed for proton production
         //Notice! simulate_lambda_decays() produced protons and pions in lambda state frame! 

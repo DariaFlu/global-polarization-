@@ -7,6 +7,7 @@
 #SBATCH --mem=8G
 #SBATCH --time=24:00:00
 #SBATCH --exclude=ncx112,ncx115,ncx117,ncx121,ncx147,ncx153,ncx156,ncx158,ncx159,ncx171,ncx181,ncx207,ncx214,ncx216,ncx222,ncx223,ncx224,ncx225,ncx227
+
 # Load necessary environment
 source /cvmfs/nica.jinr.ru/sw/os/login.sh latest
 module add mpddev
@@ -53,7 +54,7 @@ gSystem->Load("${CONFIG_DIR}AutoDict_vector_UParticle__cxx.so")
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_TVector3__cxx.so")
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_UParticle__cxx.so")
 .L ${CONFIG_DIR}read_unigen_root.cpp
-simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 50)
+simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 20)
 .q
 EOF
 

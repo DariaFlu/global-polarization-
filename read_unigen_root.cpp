@@ -187,22 +187,20 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         outEvent->SetStepNr(inEvent->GetStepNr());
         outEvent->SetStepT(inEvent->GetStepT());
         //std::cout<<"TEST_14"<<std::endl;
-
+        //first we COUNT lambdas
         for (Int_t i = 0; i < inEvent->GetNpa(); i++) {
+            UParticle* part = inEvent->GetParticle(i);
+            if (part->GetPdg() == 3122) lambdaCounter++;
+        }
+
+        //std::cout << "=====\nLambda counter in event #" << iEvent << " : " << lambdaCounter << " lambdas\n";
+
+        for (Int_t i = 0; i < inEvent->GetNpa(); ++i) {
             //std::cout<<"TEST_15_1"<<std::endl;
 
             UParticle* part = inEvent->GetParticle(i);
-            //std::cout<<"TEST_15_2"<<std::endl;
-
-            vecPolarization->clear();
-            //std::cout<<"TEST_15_3"<<std::endl;
-
-            ULambda->clear();
-            UProton->clear();
-            UPion->clear();
-            //std::cout<<"TEST_15_4"<<std::endl;
-
             if(i == inEvent->GetNpa()-1 && lambdaCounter == 0){
+                //std::cout << "do u work?" << std::endl;
                 Double_t pt  = gRandom->Uniform(0.5, 3.0);
                 Double_t phi = gRandom->Uniform(0, 2*TMath::Pi());
                 Double_t eta = gRandom->Uniform(-1, 1);
@@ -218,12 +216,23 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                     get_random_value(pt*sinh(eta), 0.03),
                     get_random_value(sqrt(pt*pt*cosh(eta)*cosh(eta) + mLambda*mLambda), 0.03)
                 );
-                part = new UParticle(i, 3122, 1, 1, 1, -15, -1,
+                UParticle* newpart = new UParticle(i, 3122, 1, 1, 1, -15, -1,
                                     child_null, newLambdaMom, newLambdaPos, 0 );
+                                    lambdaCounter++;
+                                    part = newpart;
             }
-            
-            if (part->GetPdg() != 3122) continue; // Select Lambdas (PDG code 3122)
-            lambdaCounter++;
+
+            if (part->GetPdg() != 3122) {
+                outEvent->AddParticle(*part);
+                continue; 
+            }// Select Lambdas (PDG code 3122)
+            else lambdaCounter++;
+
+            //!!!clear vectors here, bc if placed in the head of function, the vector is cleared on any non-Lambda!
+            vecPolarization->clear();
+            ULambda->clear();
+            UProton->clear();
+            UPion->clear();
             
             lambda = *part;
             set_lambda_parameterization(Lambda_yield, inEvent->GetB(), lambda); 
@@ -288,18 +297,21 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             proton = UParticle(i, 2212, 0, i, i, enhancedFlag, -1, child_null, proton_rest, proton_lab_pos, fWeight);
             pion   = UParticle(i, -211, 0, i, i, enhancedFlag, -1, child_null, pion_rest, pion_lab_pos, fWeight);
 
+            outEvent->AddParticle(lambda);
+            outEvent->AddParticle(proton);
+            outEvent->AddParticle(pion);
+
             ULambda->push_back(lambda);
             UProton->push_back(proton);
             UPion->push_back(pion);
+
+            //std::cout << "Lambda counter in event #" << iEvent << " b4 enhance : " << ULambda->size() << " lambdas\n"; 
 
             // Fill histograms
             hCosTheta->Fill(cos_theta);
             hAngVsPt->Fill(lambda_lab.Pt(), cos_theta);
             hLambdaPhi->Fill(get_positive_phi(lambda.GetMomentum().Phi()));
 
-            outEvent->AddParticle(lambda);
-            outEvent->AddParticle(proton);
-            outEvent->AddParticle(pion);
 
             Double_t fEnhanceStat = enhanceStat;
             while(fEnhanceStat > 1){ //enhancing of lambdas
@@ -336,7 +348,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
                 double phi = rand->Uniform(0, 2*TMath::Pi());
 
-                TVector3 pol = get_pol_lambda(lambda, fPolY/100., fSigmaPolVal);
+                TVector3 pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
                 vecPolarization->push_back(pol);
 
                 double cos_theta = get_costh(0.732, pol.Mag());
@@ -381,17 +393,20 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 hAngVsPt->Fill(lambda_lab.Pt(), cos_theta);
                 hLambdaPhi->Fill(get_positive_phi(enhancedLambda.GetMomentum().Phi()));
 
-                ULambda->push_back(lambda);
-                UProton->push_back(proton);
-                UPion->push_back(pion);
-    
-                outEvent->AddParticle(lambda);
-                outEvent->AddParticle(proton);
-                outEvent->AddParticle(pion);
+                outEvent->AddParticle(enhancedLambda);
+                outEvent->AddParticle(protonEnhanced);
+                outEvent->AddParticle(pionEnhanced);
 
+                ULambda->push_back(enhancedLambda);
+                UProton->push_back(protonEnhanced);
+                UPion->push_back(pionEnhanced);
+    
+                //std::cout << "ooooo Lambda counter in event #" << iEvent << " inside enhance : " << ULambda->size() << " lambdas\n"; 
                 fEnhanceStat--;
             }
         }
+        //std::cout << "Lambda counter in event #" << iEvent << " after add & enhance : " << ULambda->size() << " lambdas\n"; 
+
         outTree->Fill();
     }
     std::cout<<"TEST_15"<<std::endl;
