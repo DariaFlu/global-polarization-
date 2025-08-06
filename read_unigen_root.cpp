@@ -736,11 +736,15 @@ Double_t get_positive_phi(const Double_t& phi){
 Double_t get_costh(Double_t alpha, Double_t pol) {
 
     // TF1* randomCosTheta = new TF1("randomCosTheta", "1+(TMath::Pi()*[0]*[1])/8*x", -1.0, 1.0);
-    TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*[1]*x", -1.0, 1.0);
+    // TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*[1]*x", -1.0, 1.0);
+    TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*x", -1.0, 1.0);
+
     // Set the parameters
     // randomCosTheta->SetParameters(alpha);
 
-    randomCosTheta->SetParameters(alpha, pol);
+    // randomCosTheta->SetParameters(alpha, pol);
+    randomCosTheta->SetParameters(alpha);
+
     // Generate a random value from the distribution
     Double_t value = randomCosTheta->GetRandom();
     // std::cout<<"random costh = "<<value<<std::endl;
@@ -923,7 +927,7 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
 
     Double_t fpolx  = 0; 
     Double_t fpolSx = 0.07;  
-    Double_t fpoly  = 0;
+    Double_t fpoly  = _fpoly;
     Double_t fpolSy = 0.07; 
     Double_t fpolz  = 0;
     Double_t fpolSz = 0.07;
