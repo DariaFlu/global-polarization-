@@ -588,11 +588,11 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
             hQvector->Fill(Qx,Qy);
             if(ULambda->at(iTrack).GetMomentum().Rapidity() > 0 ){
                 QxA+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
-                QyA+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
+                QyA+=TMath::Sin(n * ULambda->at(iTrack).GetMomentum().Phi());
             }
             else{
                 QxB+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
-                QyB+=TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
+                QyB+=TMath::Sin(n * ULambda->at(iTrack).GetMomentum().Phi());
             }
 
             Double_t phiStar = get_positive_phi(UProton->at(iTrack).GetMomentum().Phi()); //Get phi*
