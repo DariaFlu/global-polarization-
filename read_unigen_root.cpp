@@ -240,7 +240,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
 
             // Get Lambda 4-momentum
-            TLorentzVector lambda_lab(part->Px(), part->Py(), part->Pz(), part->E());
+            TLorentzVector lambda_lab(lambda.Px(), lambda.Py(), lambda.Pz(), lambda.E());
             hLambdaPt->Fill(lambda_lab.Pt());
             
             // Boost to Lambda rest frame
@@ -737,7 +737,8 @@ Double_t get_costh(Double_t alpha, Double_t pol) {
 
     // TF1* randomCosTheta = new TF1("randomCosTheta", "1+(TMath::Pi()*[0]*[1])/8*x", -1.0, 1.0);
     // TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*[1]*x", -1.0, 1.0);
-    TF1* randomCosTheta = new TF1("randomCosTheta", "1+[0]*x", -1.0, 1.0);
+    TF1* randomCosTheta = new TF1("randomCosTheta", "(1+[0]*x)", -1.0, 1.0);
+    randomCosTheta->SetNpx(10000);
 
     // Set the parameters
     // randomCosTheta->SetParameters(alpha);
@@ -942,7 +943,9 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     ROOT::Math::RotationZ rotateRP(fPhi);  // set rotation transformation
     polarizationVec = rotateRP*polarizationVec;  // rotate reaction plane
 
-    Float_t polmag = TMath::Sqrt(polarizationVec.Mag());
+    // Float_t polmag = TMath::Sqrt(polarizationVec.Mag());
+    Float_t polmag = TMath::Sqrt(polarizationVec.Mag2());
+
     // special case, overpolarized -> 100% polarized
     if (polmag>1.) {
         polarizationVec *= 1./polmag;  // scale to 1
