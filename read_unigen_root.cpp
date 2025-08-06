@@ -218,8 +218,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 );
                 UParticle* newpart = new UParticle(i, 3122, 1, 1, 1, -15, -1,
                                     child_null, newLambdaMom, newLambdaPos, 0 );
-                                    lambdaCounter++;
-                                    part = newpart;
+                lambdaCounter++;
+                outEvent->AddParticle(*part);
+                part = newpart;
             }
 
             if (part->GetPdg() != 3122) {
