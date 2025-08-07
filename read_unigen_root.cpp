@@ -139,7 +139,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
     TFile* Lambda_yield = TFile::Open(confInFile,"READ");
 
-
     // Histograms
     TH1D *hLambdaPt  = new TH1D("hLambdaPt", "Lambda pT;pT [GeV/c];Counts", 100, 0, 2);
     TH1D *hCosTheta  = new TH1D("hCosTheta", "Proton cos(#theta);cos(#theta);Counts", 100, -1, 1);
@@ -289,8 +288,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             TLorentzVector proton_rest(p_proton_rest, sqrt(pStar*pStar + mProton*mProton));
             TLorentzVector pion_rest(p_pion_rest, sqrt(pStar*pStar + mPion*mPion));
 
-            TLorentzVector proton_lab_pos = part->GetPosition();
-            TLorentzVector pion_lab_pos   = part->GetPosition();
+            TLorentzVector proton_lab_pos = lambda.GetPosition();
+            TLorentzVector pion_lab_pos   = lambda.GetPosition();
             
             Double_t fWeight = 0;
             Int_t enhancedFlag = 0;
@@ -319,20 +318,20 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 enhancedFlag = -9;
 
                 TLorentzVector mom_rand(
-                    get_random_value(part->Px(), 0.03),
-                    get_random_value(part->Py(), 0.03),
-                    get_random_value(part->Pz(), 0.03),
-                    get_random_value(part->E(), 0.03)
+                    get_random_value(lambda.Px(), 0.03),
+                    get_random_value(lambda.Py(), 0.03),
+                    get_random_value(lambda.Pz(), 0.03),
+                    get_random_value(lambda.E(), 0.03)
                 );
                 
                 TLorentzVector pos_rand(
-                    get_random_value(part->X(), 0.03),
-                    get_random_value(part->Y(), 0.03),
-                    get_random_value(part->Z(), 0.03),
-                    get_random_value(part->T(), 0.03)
+                    get_random_value(lambda.X(), 0.03),
+                    get_random_value(lambda.Y(), 0.03),
+                    get_random_value(lambda.Z(), 0.03),
+                    get_random_value(lambda.T(), 0.03)
                 );
 
-                UParticle enhancedLambda(*part);
+                UParticle enhancedLambda(lambda);
                 enhancedLambda.SetPosition(pos_rand);
                 enhancedLambda.SetMate(enhancedFlag);
 
@@ -471,6 +470,8 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
     TH1D* hPsiEP = new TH1D("hPsiEP","hPsiEP ; #Psi_{EP}; Counts",100, -TMath::Pi(), TMath::Pi());
     TH2D* hQvector = new TH2D("hQvector", "Q-vector Components", 100, -100, 100, 100, -100, 100);
     TH1D* hResolution = new TH1D("hResolution","hResolution", 100,-1, 1);
+
+    TH2D* hYPt = new TH2D("hYPt", "hYPt", 100, -2, 2, 100, 0, 3);
     // Set axis titles
     fProfV2pT->GetYaxis()->SetTitle("v_{2}");
     fProfV2pT->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -487,10 +488,10 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
     for(Int_t iHisto = 0; iHisto < NpTBins_v2; iHisto++) hlambdaLabFrame_phiDistrBin [iHisto] = new TH1D(TString::Format("hlambdaLabFrame_phiDistrBin_%i",iHisto), " ; #Delta#phi, rad;Counts", 50,  0, 2*TMath::Pi());
 
     
-    Int_t dummy[2];
-    UParticle *lambda = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //lambda particle instance
-    UParticle *proton = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //proton particle instance
-    UParticle *pion   = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //pion particle instance
+    // Int_t dummy[2];
+    // UParticle *lambda = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //lambda particle instance
+    // UParticle *proton = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //proton particle instance
+    // UParticle *pion   = new UParticle(1, 1, 1, 1, 1, 1, 1, dummy, 1., 1., 1., 1., 1., 1., 1., 1., 1.); //pion particle instance
 
     // TFile* inFile  = TFile::Open(InFileName, "READ"); //Open input file with polarized proton
     // TTree *inTree = (TTree*)inFile->Get("decays");
@@ -582,8 +583,8 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
             // if (ULambda->at(iTrack).GetMomentum().Rapidity() < fYmin  || ULambda->at(iTrack).GetMomentum().Rapidity() > fYmax ) continue;
             // if (ULambda->at(iTrack).GetMomentum().Pt()       < fpTMin || ULambda->at(iTrack).GetMomentum().Pt()       > fpTMax) continue;
             
-            // Qx += TMath::Cos(n * lambda->GetMomentum().Phi());
-            // Qy += TMath::Sin(n * lambda->GetMomentum().Phi());
+            // Qx += TMath::Cos(n * lambda.GetMomentum().Phi());
+            // Qy += TMath::Sin(n * lambda.GetMomentum().Phi());
             Qx += TMath::Cos(n * ULambda->at(iTrack).GetMomentum().Phi());
             Qy += TMath::Sin(n * ULambda->at(iTrack).GetMomentum().Phi());
             hQvector->Fill(Qx,Qy);
@@ -608,15 +609,16 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
             hLambdaLabFrame_pT->Fill(ULambda->at(iTrack).GetMomentum().Pt());
             hlambdaLabFrame_Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity());
             hlambdaLabFrame_phiDistr->Fill(get_positive_phi(ULambda->at(iTrack).GetMomentum().Phi()));
-            //std::cout << "ymin:" << fYmin << " ymax: " << fYmax << " Y: " << lambda->GetMomentum().Rapidity() << std::endl;
-            // if (lambda->GetMomentum().Rapidity() > fYmin  && lambda->GetMomentum().Rapidity() < fYmax ){
+            //std::cout << "ymin:" << fYmin << " ymax: " << fYmax << " Y: " << lambda.GetMomentum().Rapidity() << std::endl;
+            // if (lambda.GetMomentum().Rapidity() > fYmin  && lambda.GetMomentum().Rapidity() < fYmax ){
             //     std::cout << "Pt " << ULambda->at(iTrack).GetMomentum().Pt() << " CosPhi " << TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())) << std::endl;
             //      fProfV2pT->Fill(ULambda->at(iTrack).GetMomentum().Pt(),      TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())));
             // }
-            // if (lambda->GetMomentum().Pt()       > fpTMin && lambda->GetMomentum().Pt()       < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(fPsi-ULambda->at(iTrack).GetMomentum().Phi())));
+            // if (lambda.GetMomentum().Pt()       > fpTMin && lambda.GetMomentum().Pt()       < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(fPsi-ULambda->at(iTrack).GetMomentum().Phi())));
             if (ULambda->at(iTrack).GetMomentum().Rapidity() > fYmin  && ULambda->at(iTrack).GetMomentum().Rapidity() < fYmax ) fProfV2pT->Fill(ULambda->at(iTrack).GetMomentum().Pt(),      TMath::Cos(2*(ULambda->at(iTrack).GetMomentum().Phi())));
-            if (ULambda->at(iTrack).GetMomentum().Pt()      > fpTMin && ULambda->at(iTrack).GetMomentum().Pt()        < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(ULambda->at(iTrack).GetMomentum().Phi())));
+            if (ULambda->at(iTrack).GetMomentum().Pt()       > fpTMin && ULambda->at(iTrack).GetMomentum().Pt()        < fpTMax) fProfV1Y ->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(),TMath::Cos(get_positive_phi(ULambda->at(iTrack).GetMomentum().Phi())));
            
+            hYPt->Fill(ULambda->at(iTrack).GetMomentum().Rapidity(), ULambda->at(iTrack).GetMomentum().Pt());
             lambdaCounter++;
         }
         //std::cout<<"number of lambda within event "<<lambdaCounter<<std::endl;
@@ -703,6 +705,7 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
     hPsiEP->Write();
     hQvector->Write();
     hResolution->Write();
+    hYPt->Write();
     // outFile->Close();
     // inFile->Close();
     // std::cout<<"Close() "<<std::endl;
@@ -823,9 +826,17 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     f.SetNpx(10000);  // to get a better result when using TF1::GetRandom
     Double_t phi=f.GetRandom();
 
-    Double_t fEnergyLambda = ULambda.GetMomentum().E();
+    // Double_t fEnergyLambda = ULambda.GetMomentum().E();
+    // Calculate total energy (E) properly
     TLorentzVector vec;
-    vec.SetPtEtaPhiE(lambda_pT, lambda_y, phi, fEnergyLambda);
+    // Calculate transverse mass (m_T)
+    Double_t lambda_mass = 1.115683; // GeV/c² (Lambda mass)
+    Double_t mT = sqrt(lambda_pT * lambda_pT + lambda_mass * lambda_mass);
+    // Convert rapidity (y) to pseudorapidity (η)
+    Double_t pz = mT * sinh(lambda_y); // longitudinal momentum
+    Double_t lambda_eta = (pz != 0.0) ? TMath::ATanH(pz / sqrt(pz*pz + lambda_pT*lambda_pT)) : 0.0;
+    Double_t fEnergyLambda = sqrt(lambda_pT*lambda_pT * cosh(lambda_eta)*cosh(lambda_eta) + lambda_mass*lambda_mass);
+    vec.SetPtEtaPhiE(lambda_pT, lambda_eta, phi, fEnergyLambda);
     ULambda.SetMomentum(vec); //ULambda
 
 
