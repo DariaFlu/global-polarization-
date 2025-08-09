@@ -35,26 +35,11 @@ void lambdaPolCalc() {
 
     TString fileOutName = "result_global_polarization_urqmd_xexe_2.87gev_mf_6195240"; //resulting .root file, it contains deltaPhi distributions
     TString fileOutFormat = ".mcini.root"; //resulting .root file, it contains deltaPhi distributions
-    // std::vector<Int_t> vecEnhancedValue = {0, 1, 2, 5, 10, 50};
-    std::vector<Int_t> vecEnhancedValue = {0, 50};
-    // TFile* file;
-    // for (auto iMult : vecEnhancedValue) calc_global_polarization(TString::Format("%s%s",pathIn.Data(), fileIn.Data()),  TString::Format("%s%s_%i_%s",pathOut.Data(), fileOutName.Data(), iMult, fileOutFormat.Data()), iMult);
-    // for (int i = 1; i < 2000; i++){
-    //     file = TFile::Open(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), i), "READ");
-    //     if (file && !file->IsZombie()) {
-    //     // if (!(TFile::Open(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), i), "READ")->IsZombie())){
-    //     // if (gSystem->AccessPathName(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), i))){
-    //         for (auto iMult : vecEnhancedValue) calc_global_polarization(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), i),  TString::Format("%s%s_iMult%i%s",pathOut.Data(), fileOutName.Data(), iMult, fileOutFormat.Data()), iMult);
-    //     // }
-    //     }
-    //     else {
-    //         // Handle the case when file couldn't be opened
-    //         std::cerr << "Error: Could not open file " 
-    //                   << TString::Format("%s%s_%i.mcini.root", pathIn.Data(), fileIn.Data(), i)
-    //                   << std::endl;
-    //     }
-    // }   
+    std::vector<Int_t> vecEnhancedValue = {0, 1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 49, 50};
     calc_global_polarization(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), 1),  TString::Format("%s%s%s",pathOut.Data(), fileOutName.Data(), fileOutFormat.Data()), 50);
+
+    //UNCOMMENT if u wanna test pX,pY,pMag (vecEnhancedValue)
+    // calc_pol_vs_Nenh(TString::Format("%s%s_%i.mcini.root",pathIn.Data(), fileIn.Data(), 1),  "test.root", vecEnhancedValue);
     std::cout << "ROOT file saved and closed." << std::endl;
     std::cout << "Analysis complete! Results saved to lambda_polarization_results.root" << std::endl;
 
