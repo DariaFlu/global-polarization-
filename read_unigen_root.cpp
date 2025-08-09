@@ -781,29 +781,53 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
     TH2D* hPy_Nlamb   = new TH2D("hPy_Nlambd","hPy_Nlambd", nBinsEnh, enhancedFlag.at(0), *(enhancedFlag.end() - 1), 50, -1., 1.);
     TH2D* hPmag_lamb = new TH2D("hPmag_lambd","hPmag_lambd", nBinsEnh, enhancedFlag.at(0), *(enhancedFlag.end() - 1), 50, -1., 1.);
 
+    TProfile* hPx_pT = new TProfile("hPx_pT", "hPx_pT", 50, 0., 3.0, -50, 50);
+    TProfile* hPy_pT = new TProfile("hPy_pT", "hPy_pT", 50, 0., 3.0, -50, 50);
+    TProfile* hPz_pT = new TProfile("hPz_pT", "hPz_pT", 50, 0., 3.0, -50, 50);
 
-    for(size_t iEnh = 0; iEnh < enhancedFlag.size(); iEnh++){
-        Int_t enhFlag = enhancedFlag[iEnh];
-        std::cout << "eng flag: " << enhFlag << std::endl;
 
-        for(Long64_t iEvent = 0; iEvent < nEvents; iEvent++){
-            // inTree->GetEntry(iEvent);
-            inChain->GetEntry(iEvent);
-            int lambdas = 0;
-            for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
-                hPx_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).X());
-                hPy_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).Y());
-                hPmag_lamb->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
-                if (ULambda->at(pols_i).GetMate() == -9){
-                    lambdas++;
-                    hPx_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).X());
-                    hPy_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).Y());
-                    hPmag_Nenh->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
-                    if (lambdas > enhFlag) break;
-                }
-            }
+    TProfile* hPx_Y = new TProfile("hPx_y", "hPx_y", 50, -1., 1., -50, 50);
+    TProfile* hPy_Y = new TProfile("hPy_y", "hPy_y", 50, -1., 1., -50, 50);
+    TProfile* hPz_Y = new TProfile("hPz_Y", "hPz_Y", 50, -1., 1., -50, 50);
+
+    for(Long64_t iEvent = 0; iEvent < nEvents; iEvent++){
+        // inTree->GetEntry(iEvent);
+        inChain->GetEntry(iEvent);
+        int lambdas = 0;
+        for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
+            //std::cout << "pz: " << vecPolarization->at(pols_i).Z() * 100 << std::endl;
+            hPx_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).X() * 100);
+            hPy_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Y() * 100);
+            hPz_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Z() * 100);
+            hPx_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).X() * 100);
+            hPy_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).Y() * 100);
+            hPz_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).Z() * 100);
         }
     }
+
+
+    // for(size_t iEnh = 0; iEnh < enhancedFlag.size(); iEnh++){
+    //     Int_t enhFlag = enhancedFlag[iEnh];
+    //     std::cout << "eng flag: " << enhFlag << std::endl;
+
+    //     for(Long64_t iEvent = 0; iEvent < nEvents; iEvent++){
+    //         // inTree->GetEntry(iEvent);
+    //         inChain->GetEntry(iEvent);
+    //         int lambdas = 0;
+    //         for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
+    //             hPx_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).X());
+    //             hPy_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).Y());
+    //             hPmag_lamb->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
+    //             if (ULambda->at(pols_i).GetMate() == -9){
+    //                 lambdas++;
+    //                 hPx_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).X());
+    //                 hPy_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).Y());
+    //                 hPmag_Nenh->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
+    //                 if (lambdas > enhFlag) break;
+    //             }
+    //         }
+    //     }
+    // }
 
 
     TFile *outFile = TFile::Open(OutFileName, "RECREATE");//Resulting out file
@@ -814,6 +838,13 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
     hPx_Nlamb->Write();
     hPy_Nlamb->Write();
     hPmag_lamb->Write();
+
+    hPx_pT->Write();
+    hPy_pT->Write();
+    hPz_pT->Write();
+    hPx_Y->Write();
+    hPy_Y->Write();
+    hPz_Y->Write();
 
     outFile->Close();
 }
