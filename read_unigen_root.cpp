@@ -265,6 +265,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             double cos_theta = get_costh(0.732, pol.Mag());
             double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
 
+            if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
+            else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
+
             TVector3 unit = TVector3(
                 sin_theta * cos(phi),
                 sin_theta * sin(phi),
@@ -359,7 +362,10 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
                 double cos_theta = get_costh(0.732, pol.Mag());
                 double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
-    
+
+                if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
+                else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
+
                 TVector3 unit = TVector3(
                     sin_theta * cos(phi),
                     sin_theta * sin(phi),
@@ -462,8 +468,8 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
     Int_t NYBins = 11; //number of rapidity bins
     Double_t fpTMax_bin = 1.6; // max pT [GeV/c]
     Double_t fpTMin_bin = 0.2; // min pT [GeV/c]
-    Double_t fYMax_bin =  0.5; // max rapidity
-    Double_t fYMin_bin = -0.5; // min rapidity
+    Double_t fYMax_bin =  1.5; // max rapidity
+    Double_t fYMin_bin = -1.5; // min rapidity
 
     //--Histograms--//
     TH1D* hProtonLambdaFrame_phi = new TH1D("hProtonLambdaFrame_phi", " ; #Delta#phi, rad;Counts", 50,  0, 2*TMath::Pi()); //proton phi* distribution (lambda frame)
@@ -790,12 +796,20 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
     TProfile* hPy_Y = new TProfile("hPy_y", "hPy_y", 50, -1., 1., -50, 50);
     TProfile* hPz_Y = new TProfile("hPz_Y", "hPz_Y", 50, -1., 1., -50, 50);
 
+    Double_t fpTMin = 0.4;//GeV/C
+    Double_t fpTMax = 2.0;//GeV/C
+    Double_t fYmin = -0.75;
+    Double_t fYmax = 0.75;
+
     for(Long64_t iEvent = 0; iEvent < nEvents; iEvent++){
         // inTree->GetEntry(iEvent);
         inChain->GetEntry(iEvent);
         int lambdas = 0;
         for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
             //std::cout << "pz: " << vecPolarization->at(pols_i).Z() * 100 << std::endl;
+            Double_t pT = ULambda->at(pols_i).GetMomentum().Pt();
+            Double_t Y = ULambda->at(pols_i).GetMomentum().Rapidity();
+            if (pT < fpTMin || pT > fpTMax || Y < fYmin || Y > fYmax) continue;
             hPx_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).X() * 100);
             hPy_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Y() * 100);
             hPz_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Z() * 100);
