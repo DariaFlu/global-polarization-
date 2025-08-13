@@ -247,7 +247,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             TVector3 pol = get_pol_lambda(lambda, fPolY/100., fSigmaPolVal);
             vecPolarization->push_back(pol);
 
-            pol = WignerRotatePolarization(pol,lambda_lab);
+            // pol = WignerRotatePolarization(pol,lambda_lab);
             // TLorentzVector S_lab(pol.X(), pol.Y(), pol.Z(), 0.0);
             // TLorentzVector S_rest = S_lab; 
             // S_rest.Boost(-lambda_lab.BoostVector());
@@ -357,7 +357,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 // S_rest.Boost(-lambda_lab.BoostVector());
                 // TVector3 n_star = S_rest.Vect().Unit();
                 // pol = n_star;
-                pol = WignerRotatePolarization(pol,lambda_lab);
+                // pol = WignerRotatePolarization(pol,lambda_lab);
 
                 double cos_theta = get_costh(0.732, pol.Mag());
                 double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
@@ -1028,6 +1028,7 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
 
     void set_lambda_parameterization(TFile* Lambda_yield, Double_t fBVal, UParticle &ULambda){ //Valeriy's function for properly lambda generation
 
+    TRandom3* rand = new TRandom3(0);  // Seed with 0 for reproducibility
 
 	Double_t centrality = get_centrality(fBVal); //centrality for parameterization (b->centrality for Xe+Xe below)
 	Double_t sNN = 2.87; // Energy of the collision in center-of-mass system
@@ -1041,7 +1042,7 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     Double_t lambda_pT; // pT of Lambda from pT-y TH2F
 	Double_t lambda_y;  // rapidity of Lambda from pT-y TH2F
 
-	h_pt_y->GetRandom2(lambda_y,lambda_pT);
+	h_pt_y->GetRandom2(lambda_y,lambda_pT,rand);
 
 	Double_t v1 = (28.8635/(TMath::Power(sNN,2.89092))) 
                 * ((-0.0233*centrality+0.5413* TMath::Power(centrality,1./3) ) 
@@ -1072,7 +1073,7 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     f.SetParameter(2,v2);  // v2
     f.SetParameter(3,-a/(2*TMath::Pi()*(1-a))); // shift to have probability
     f.SetNpx(10000);  // to get a better result when using TF1::GetRandom
-    Double_t phi=f.GetRandom();
+    Double_t phi=f.GetRandom(rand);
 
     // Double_t fEnergyLambda = ULambda.GetMomentum().E();
     // Calculate total energy (E) properly
@@ -1086,6 +1087,8 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     Double_t fEnergyLambda = sqrt(lambda_pT*lambda_pT * cosh(lambda_eta)*cosh(lambda_eta) + lambda_mass*lambda_mass);
     vec.SetPtEtaPhiE(lambda_pT, lambda_eta, phi, fEnergyLambda);
     ULambda.SetMomentum(vec); //ULambda
+
+    delete rand;
 
 
 }
@@ -1192,9 +1195,14 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     Double_t fpolz  = 0;
     Double_t fpolSz = 0.07;
 
-    Double_t polX = gRandom->Gaus(fpolx,fpolSx);  // generate polarization direction
-    Double_t polY = gRandom->Gaus(fpoly,fpolSy);  // generate polarization direction /100
-    Double_t polZ = gRandom->Gaus(fpolz,fpolSz);  // generate polarization direction
+    TRandom3* rand = new TRandom3(0);  // Seed with 0 for reproducibility
+    Double_t polX = rand->Gaus(fpolx,fpolSx);
+    Double_t polY = rand->Gaus(fpoly,fpolSy);
+    Double_t polZ = rand->Gaus(fpolz,fpolSz);
+
+    // Double_t polX = gRandom->Gaus(fpolx,fpolSx);  // generate polarization direction
+    // Double_t polY = gRandom->Gaus(fpoly,fpolSy);  // generate polarization direction /100
+    // Double_t polZ = gRandom->Gaus(fpolz,fpolSz);  // generate polarization direction
     TVector3 polarizationVec = TVector3(polX, polY, polZ);
 
     // std::cout<<"TVector3(polX, polY, polZ) "<<polX<<" "<<polY<<" "<<polZ<<std::endl;
@@ -1215,15 +1223,18 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     // random unitary vector, see https://mathworld.wolfram.com/SpherePointPicking.html
         Double_t x1,x2,R2,R;
         do {
-            x1 = 1-2*gRandom->Rndm();
-            x2 = 1-2*gRandom->Rndm();
+            // x1 = 1-2*gRandom->Rndm();
+            // x2 = 1-2*gRandom->Rndm();
+            x1 = 1-2*rand->Rndm();
+            x2 = 1-2*rand->Rndm();
             R2 = x1*x1+x2*x2;
         } while(R2 >= 1);
         R=2*TMath::Sqrt(1-R2);
         polarizationVec.SetXYZ(x1*R, x2*R, 1-2*R2);  // random unitary vector - background for signal
     }
 
-    Float_t xxx = gRandom->Rndm();
+    // Float_t xxx = gRandom->Rndm();
+    Float_t xxx = rand->Rndm();
     if (xxx < 1./2.*(1.-polmag)) {  // probability of spin flip
         polarizationVec *= -1.;  // spin flip according to mean polarization
     }
@@ -1231,6 +1242,7 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     // std::cout<<"polmag =  "<<polmag<<std::endl;
 
     //std::cout<<"Polarization generated (X,Y,Z) "<<polarizationVec.X()<<" "<<polarizationVec.Y()<<" "<<polarizationVec.Z()<<std::endl;
+    delete rand;
     return polarizationVec;
 }
 
