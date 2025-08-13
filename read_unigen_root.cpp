@@ -211,21 +211,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 TLorentzVector newLambdaPos( 1., 1., 1., 1.);
                 TLorentzVector newLambdaMom( 1., 1., 1., 1. );
 
-                // Double_t pt  = gRandom->Uniform(0.5, 3.0);
-                // Double_t phi = gRandom->Uniform(0, 2*TMath::Pi());
-                // Double_t eta = gRandom->Uniform(-1, 1);
-
-                // TLorentzVector newLambdaPos(
-                //     get_random_value(0, 0.03),
-                //     get_random_value(0, 0.03),
-                //     get_random_value(0, 0.03),
-                //     get_random_value(0, 0.03));
-                // TLorentzVector newLambdaMom(
-                //     get_random_value(pt*cos(phi), 0.03),
-                //     get_random_value(pt*sin(phi), 0.03),
-                //     get_random_value(pt*sinh(eta), 0.03),
-                //     get_random_value(sqrt(pt*pt*cosh(eta)*cosh(eta) + mLambda*mLambda), 0.03));
-
                 UParticle* newpart = new UParticle(i, 3122, 1, 1, 1, -15, -1,
                                     child_null, newLambdaMom, newLambdaPos, 0 );
                 lambdaCounter++;
@@ -290,7 +275,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
             else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
       
-//TEEEEEEST
+// //TEEEEEEST WITHOUT POLARIZATION
 // phi = gRandom->Uniform(0, 2*TMath::Pi());
 // cos_theta = gRandom->Uniform(-1, 1);
 // sin_theta = gRandom->Uniform(-1, 1);
@@ -339,13 +324,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 enhancedFlag = -9;
 
                 TLorentzVector mom_rand( 1., 1., 1., 1. );
-                
-                // TLorentzVector mom_rand(
-                //     get_random_value(lambda.Px(), 0.03),
-                //     get_random_value(lambda.Py(), 0.03),
-                //     get_random_value(lambda.Pz(), 0.03),
-                //     get_random_value(lambda.E(), 0.03)
-                // );
                 
                 TLorentzVector pos_rand(
                     get_random_value(lambda.X(), 0.03),
@@ -403,7 +381,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
                 else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
 
-// //TEEEEEEST
+// // //TEEEEEEST WITHOUT POLARIZATION
 // phi = gRandom->Uniform(0, 2*TMath::Pi());
 // cos_theta = gRandom->Uniform(-1, 1);
 // sin_theta = gRandom->Uniform(-1, 1);
@@ -482,7 +460,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enhancedFlag){
     gStyle->SetOptStat(0);  // Disable stats globally
     TF1* fitPhiDistro = new TF1("fitPhiDistro", "[0]*(1+2*[1]*TMath::Sin(x)+2*[2]*TMath::Cos(x))", 0, 2*TMath::Pi()); //Fitting function
-    fitPhiDistro->SetParameter(1, 4.*(TMath::Pi()*0.732)/(8.*100));
+    fitPhiDistro->SetParameter(1, 4.*(TMath::Pi()*0.732)/(8.*100)); //initial guess for fit
     // TF1* fitPhiDistro = new TF1("fitPhiDistro", 
     //     "[0]*(1 + [1]*sin(x) + [2]*cos(x) + [3]*sin(2*x) + [4]*cos(2*x))", 
     //     0, 2*TMath::Pi());
@@ -1078,6 +1056,9 @@ Int_t get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue,
     // if( v2  > 1 ) v2 =1;
     // std::cout<<" v2 value =  "<<v2<<std::endl;
     // generate phi according to v1 and v2
+    // v1 = 0.0;   //generation WITHOUT flows
+    // v2 = 0.0;
+
     static TF1 f("f", "[0]*(1+2*[1]*TMath::Cos(x)+2*[2]*TMath::Cos(2*x))+[3]", 0,2*TMath::Pi());
     Double_t a1=1+2*v1+2*v2;
     Double_t a2=1-2*v1+2*v2;
