@@ -41,7 +41,7 @@ Double_t get_centrality  (Double_t fBVal);
 Double_t get_costh(Double_t alpha, Double_t pol = 0.6);
 Double_t get_V2   (Double_t sNN, Double_t centrality, Double_t lambda_pT, Double_t lambda_y);
 Int_t    get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue, Int_t NBins); 
-TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol = 0.3);
+ROOT::Math::XYZVector get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol = 0.3);
 
 
 class TString;
@@ -49,7 +49,6 @@ class TClonesArray;
 class UParticle;
 
 void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t> &enhancedFlag);
-TVector3 WignerRotatePolarization(const TVector3& pol_lab, const TLorentzVector& p_lambda_lab);
 
 
 void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t enhanceStat) {
@@ -61,31 +60,30 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     TFile *outFile = nullptr;
     TTree *outTree = nullptr;
     
-    //std::cout<<"TEST_1"<<std::endl;
     // Important variables that were accidentally removed
     double cos_theta_p = 0;  // Proton angle relative to some axis (for anisotropy)
     Int_t eventID;
     std::vector<UParticle>* ULambda = nullptr;
     std::vector<UParticle>* UProton = nullptr;
     std::vector<UParticle>* UPion = nullptr;
-    std::vector<TVector3>* vecPolarization = nullptr;
-    //std::cout<<"TEST_2"<<std::endl;
+    std::vector<ROOT::Math::XYZVector>* vecPolarization = nullptr;
+    std::vector<ROOT::Math::XYZVector>* vecPol = nullptr;
+
+    // std::vector<ROOT::Math::XYZVector>* vecPol_XYZ = nullptr;
+
 
     // Open input file as TChain
     inChain = new TChain("events");
     inChain->Add(inputFile);
-    //std::cout<<"TEST_3"<<std::endl;
 
     // Create output file and tree
     // TFile *outFile = new TFile(outputFile, "RECREATE");
-    //std::cout<<"TEST_4"<<std::endl;
 
     outFile = TFile::Open(outputFile, "UPDATE");
     if (!outFile || outFile->IsZombie()) {
         delete outFile;
         outFile = TFile::Open(outputFile, "RECREATE");
         std::cout << "Creating new output file: " << outputFile << std::endl;
-        //std::cout<<"TEST_5"<<std::endl;
 
     }
 
@@ -95,12 +93,10 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     UEvent  *inEvent = nullptr;
     UEvent  *outEvent = new UEvent();
     inChain->SetBranchAddress("event", &inEvent);
-    //std::cout<<"TEST_6"<<std::endl;
 
     outTree = (TTree*)outFile->Get("decays");
     bool newTree = false;
     if (!outTree) {
-        //std::cout<<"TEST_7"<<std::endl;
 
         outTree = new TTree("decays", "Lambda decay products");
         newTree = true;
@@ -113,14 +109,13 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         outTree->Branch("ULambda", &ULambda);
         outTree->Branch("UProton", &UProton);
         outTree->Branch("UPion", &UPion);
-        outTree->Branch("Polarization", &vecPolarization);
-        //std::cout<<"TEST_8"<<std::endl;
+        outTree->Branch("Polarization", &vecPol);
+        outTree->Branch("LambdaPolarization", &vecPolarization);
 
 
     } else {
-        //std::cout<<"TEST_9"<<std::endl;
 
-        // vecPolarization.clear();
+        // vecPol.clear();
         // ULambda.clear();
         // UProton.clear();
         // UPion.clear();
@@ -134,8 +129,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         outTree->SetBranchAddress("ULambda", &ULambda);
         outTree->SetBranchAddress("UProton", &UProton);
         outTree->SetBranchAddress("UPion", &UPion);
-        outTree->SetBranchAddress("Polarization", &vecPolarization);
-        //std::cout<<"TEST_10"<<std::endl;
+        outTree->SetBranchAddress("Polarization", &vecPol);
+        outTree->SetBranchAddress("LambdaPolarization", &vecPolarization);
 
     }
 
@@ -167,15 +162,12 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     Double_t fBMax = 7.44;
     Int_t child_null[2] = {0, 0};
 
-    //std::cout<<"TEST_11"<<std::endl;
 
     // Process events
     Long64_t nEvents = inChain->GetEntries();
-    //std::cout<<"TEST_12"<<std::endl;
 
     std::cout << "Events: " << nEvents << std::endl;
     for (Long64_t iEvent = 0; iEvent < nEvents; iEvent++) {
-        //std::cout<<"TEST_13"<<std::endl;
 
         inChain->GetEntry(iEvent);
         outEvent->Clear(); // Clear previous event
@@ -189,11 +181,11 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         outEvent->SetStepNr(inEvent->GetStepNr());
         outEvent->SetStepT(inEvent->GetStepT());
 
+        vecPol->clear();
         vecPolarization->clear();
         ULambda->clear();
         UProton->clear();
         UPion->clear();
-        //std::cout<<"TEST_14"<<std::endl;
         //first we COUNT lambdas
         for (Int_t i = 0; i < inEvent->GetNpa(); i++) {
             UParticle* part = inEvent->GetParticle(i);
@@ -203,23 +195,31 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         //std::cout << "=====\nLambda counter in event #" << iEvent << " : " << lambdaCounter << " lambdas\n";
 
         for (Int_t i = 0; i < inEvent->GetNpa(); ++i) {
-            //std::cout<<"TEST_15_1"<<std::endl;
 
             UParticle* part = inEvent->GetParticle(i);
             if(i == inEvent->GetNpa()-1 && lambdaCounter == 0){
 
-                TLorentzVector newLambdaPos( 1., 1., 1., 1.);
+                TLorentzVector newLambdaPos( 
+                                            get_random_value(0, 12), 
+                                            get_random_value(0, 12), 
+                                            get_random_value(0, 20), 
+                                            0
+                                            );
                 TLorentzVector newLambdaMom( 1., 1., 1., 1. );
 
                 UParticle* newpart = new UParticle(i, 3122, 1, 1, 1, -15, -1,
                                     child_null, newLambdaMom, newLambdaPos, 0 );
                 lambdaCounter++;
                 outEvent->AddParticle(*part);
+                ROOT::Math::XYZVector nullPol(0, 0, 0);
+                vecPolarization->push_back(nullPol);
                 part = newpart;
             }
 
             if (part->GetPdg() != 3122) {
                 outEvent->AddParticle(*part);
+                ROOT::Math::XYZVector nullPol(0, 0, 0);
+                vecPolarization->push_back(nullPol);
                 continue; 
             }// Select Lambdas (PDG code 3122)
             else lambdaCounter++;
@@ -244,17 +244,11 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                                 (2*mLambda);
             
             double phi = rand->Uniform(0, 2*TMath::Pi());
-            TVector3 pol = get_pol_lambda(lambda, fPolY/100., fSigmaPolVal);
+            ROOT::Math::XYZVector pol = get_pol_lambda(lambda, fPolY/100., fSigmaPolVal);
+            vecPol->push_back(pol);
             vecPolarization->push_back(pol);
 
-            // pol = WignerRotatePolarization(pol,lambda_lab);
-            // TLorentzVector S_lab(pol.X(), pol.Y(), pol.Z(), 0.0);
-            // TLorentzVector S_rest = S_lab; 
-            // S_rest.Boost(-lambda_lab.BoostVector());
-            // TVector3 n_star = S_rest.Vect().Unit();
-            // pol = n_star;
-
-            double cos_theta = get_costh(0.732, pol.Mag());
+            double cos_theta = get_costh(0.732, pol.R());
             double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
 
             if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
@@ -265,8 +259,12 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 sin_theta * sin(phi),
                 cos_theta
             );
+            TVector3 unit_tv3(unit.X(), unit.Y(), unit.Z());
+            TVector3 pol_tv3(pol.X(), pol.Y(), pol.Z());
+            unit_tv3.RotateUz(pol_tv3.Unit());
+            unit = TVector3(unit_tv3.X(), unit_tv3.Y(), unit_tv3.Z());
 
-            unit.RotateUz(pol.Unit()); // rotate Z to norm (with extra phi rotation which is random)
+            // unit.RotateUz(pol.Unit()); // rotate Z to norm (with extra phi rotation which is random)
 
             phi = unit.Phi();
             cos_theta = TMath::Cos(unit.Theta());
@@ -274,11 +272,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
             if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
             else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
-      
-// //TEEEEEEST WITHOUT POLARIZATION
-// phi = gRandom->Uniform(0, 2*TMath::Pi());
-// cos_theta = gRandom->Uniform(-1, 1);
-// sin_theta = gRandom->Uniform(-1, 1);
 
             //Generate proton momentum in lambda rest frame
             TVector3 p_proton_rest = pStar * TVector3(
@@ -304,8 +297,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             pion   = UParticle(i, -211, 0, i, i, enhancedFlag, -1, child_null, pion_rest, pion_lab_pos, fWeight);
 
             outEvent->AddParticle(lambda);
-            outEvent->AddParticle(proton);
-            outEvent->AddParticle(pion);
+            // outEvent->AddParticle(proton);
+            // outEvent->AddParticle(pion);
 
             ULambda->push_back(lambda);
             UProton->push_back(proton);
@@ -349,17 +342,11 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
                 double phi = rand->Uniform(0, 2*TMath::Pi());
 
-                TVector3 pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
+                ROOT::Math::XYZVector pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
+                vecPol->push_back(pol);
                 vecPolarization->push_back(pol);
 
-                // TLorentzVector S_lab(pol.X(), pol.Y(), pol.Z(), 0.0);
-                // TLorentzVector S_rest = S_lab; 
-                // S_rest.Boost(-lambda_lab.BoostVector());
-                // TVector3 n_star = S_rest.Vect().Unit();
-                // pol = n_star;
-                // pol = WignerRotatePolarization(pol,lambda_lab);
-
-                double cos_theta = get_costh(0.732, pol.Mag());
+                double cos_theta = get_costh(0.732, pol.R());
                 double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
 
 
@@ -371,8 +358,12 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                     sin_theta * sin(phi),
                     cos_theta
                 );
-    
-                unit.RotateUz(pol.Unit());
+
+                TVector3 unit_tv3(unit.X(), unit.Y(), unit.Z());
+                TVector3 pol_tv3(pol.X(), pol.Y(), pol.Z());
+                unit_tv3.RotateUz(pol_tv3.Unit());
+                unit = TVector3(unit_tv3.X(), unit_tv3.Y(), unit_tv3.Z());
+                // unit.RotateUz(pol.Unit());
     
                 phi = unit.Phi();
                 cos_theta = TMath::Cos(unit.Theta());
@@ -381,10 +372,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 if (TMath::Abs(cos_theta) >= 1.0) cos_theta = TMath::Sign(1.0, cos_theta);
                 else sin_theta = TMath::Sqrt((1. - cos_theta) * (1. + cos_theta));
 
-// // //TEEEEEEST WITHOUT POLARIZATION
-// phi = gRandom->Uniform(0, 2*TMath::Pi());
-// cos_theta = gRandom->Uniform(-1, 1);
-// sin_theta = gRandom->Uniform(-1, 1);
 
                 TVector3 p_proton_rest = pStar * TVector3(
                     sin_theta * cos(phi),
@@ -411,8 +398,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 hLambdaPhi->Fill(get_positive_phi(enhancedLambda.GetMomentum().Phi()));
 
                 outEvent->AddParticle(enhancedLambda);
-                outEvent->AddParticle(protonEnhanced);
-                outEvent->AddParticle(pionEnhanced);
+                // outEvent->AddParticle(protonEnhanced);
+                // outEvent->AddParticle(pionEnhanced);
 
                 ULambda->push_back(enhancedLambda);
                 UProton->push_back(protonEnhanced);
@@ -426,7 +413,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
         outTree->Fill();
     }
-    std::cout<<"TEST_15"<<std::endl;
 
     outFile->cd();
     outTree->Write("",TObject::kOverwrite);
@@ -496,8 +482,8 @@ void calc_global_polarization(TString InFileName, TString OutFileName, Int_t enh
 
 //---------_TEST
 //--LAB
-TH2D* hProtonMomentumLab_XY = new TH2D("hProtonMomentumLab_XY","hProtonMomentumLab_XY ; p_{X}; p_{Y}", 100, -3, 3, 100, -3, 3);
-TH2D* hProtonMomentumLab_YZ = new TH2D("hProtonMomentumLab_YZ","hProtonMomentumLab_YZ ; p_{Y}; p_{Z}", 100, -3, 3, 100, -3, 3);
+    TH2D* hProtonMomentumLab_XY = new TH2D("hProtonMomentumLab_XY","hProtonMomentumLab_XY ; p_{X}; p_{Y}", 100, -3, 3, 100, -3, 3);
+    TH2D* hProtonMomentumLab_YZ = new TH2D("hProtonMomentumLab_YZ","hProtonMomentumLab_YZ ; p_{Y}; p_{Z}", 100, -3, 3, 100, -3, 3);
     TH1D* hProtonMomentumLab_Mag  = new TH1D("hProtonMomentumLab_Mag", "hProtonMomentumLab_Mag; Momentum.Rho(); Counts", 100, -3, 3); 
 
     TH2D* hPionMomentumLab_XY = new TH2D("hPionMomentumLab_XY","hPionMomentumLab_XY ; p_{X}; p_{Y}",100, -3, 3, 100, -3, 3);
@@ -505,14 +491,13 @@ TH2D* hProtonMomentumLab_YZ = new TH2D("hProtonMomentumLab_YZ","hProtonMomentumL
     TH1D* hPionMomentumLab_Mag  = new TH1D("hPionMomentumLab_Mag", "hPionMomentumLab_Mag; Momentum.Rho(); Counts", 100, -3, 3); 
 
 //--REST
-TH2D* hProtonMomentumRest_XY = new TH2D("hProtonMomentumRest_XY","hProtonMomentumRest_XY ; p_{X}; p_{Y}",100, -3, 3, 100, -3, 3);
-TH2D* hProtonMomentumRest_YZ = new TH2D("hProtonMomentumRest_YZ","hProtonMomentumRest_YZ ; p_{Y}; p_{Z}",100, -3, 3, 100, -3, 3);
+    TH2D* hProtonMomentumRest_XY = new TH2D("hProtonMomentumRest_XY","hProtonMomentumRest_XY ; p_{X}; p_{Y}",100, -3, 3, 100, -3, 3);
+    TH2D* hProtonMomentumRest_YZ = new TH2D("hProtonMomentumRest_YZ","hProtonMomentumRest_YZ ; p_{Y}; p_{Z}",100, -3, 3, 100, -3, 3);
     TH1D* hProtonMomentumLRest_Mag  = new TH1D("hProtonMomentumLRest_Mag", "hProtonMomentumLRest_Mag; Momentum.Rho(); Counts", 100, -3, 3); 
 
     TH2D* hPionMomentumRest_XY = new TH2D("hPionMomentumRest_XY","hPionMomentumRest_XY ; p_{X}; p_{Y}",100, -3, 3, 100, -3, 3);
     TH2D* hPionMomentumRest_YZ = new TH2D("hPionMomentumRest_YZ","hPionMomentumRest_YZ ; p_{Y}; p_{Z}",100, -3, 3, 100, -3, 3);
     TH1D* hPionMomentumRest_Mag  = new TH1D("hPionMomentumRest_Mag", "hPionMomentumRest_Mag; Momentum.Rho(); Counts", 100, -3, 3);  
-
 
 
     TH2D* hProtonPionMomentumLab_XX = new TH2D("hProtonPionMomentumLab_XX","hProtonPionMomentumLab_XX ; proton p_{X}; pion p_{Y}",100, -3, 3, 100, -3, 3);
@@ -574,13 +559,13 @@ TH2D* hProtonMomentumRest_YZ = new TH2D("hProtonMomentumRest_YZ","hProtonMomentu
     std::vector<UParticle> *ULambda = nullptr;
     std::vector<UParticle> *UProton = nullptr; 
     std::vector<UParticle> *UPion = nullptr; 
-    std::vector<TVector3> *vecPolarization = nullptr;
+    std::vector<ROOT::Math::XYZVector> *vecPol = nullptr;
 
     UEvent *inEvent = new UEvent ();
 
     inChain->SetBranchAddress("event", &inEvent);
 
-    inChain->SetBranchAddress("Polarization", &vecPolarization);
+    inChain->SetBranchAddress("Polarization", &vecPol);
     inChain->SetBranchAddress("UProton", &UProton);
     inChain->SetBranchAddress("ULambda", &ULambda);
     inChain->SetBranchAddress("UPion", &UPion);
@@ -605,15 +590,15 @@ TH2D* hProtonMomentumRest_YZ = new TH2D("hProtonMomentumRest_YZ","hProtonMomentu
         inChain->GetEntry(iEvent);
 
         // std::cout<<"Event No"<<iEvent<<std::endl;
-        // std::cout << "vector size: " << vecPolarization->size() << std::endl;
-        // std::cout<<"vecPolarization->at(iTrack).X()"<<std::endl;
-        // std::cout<<vecPolarization->at(0).X()<<std::endl;
+        // std::cout << "vector size: " << vecPol->size() << std::endl;
+        // std::cout<<"vecPol->at(iTrack).X()"<<std::endl;
+        // std::cout<<vecPol->at(0).X()<<std::endl;
 
         Int_t lambdaCounter = 0;
         Double_t Qx = 0, Qy = 0;
         Double_t QxA = 0, QyA = 0, QxB = 0, QyB = 0;
         Double_t fPsi = 0;
-        for(size_t iTrack = 0; iTrack < vecPolarization->size(); iTrack++){
+        for(size_t iTrack = 0; iTrack < vecPol->size(); iTrack++){
             
             if(get_centrality(inEvent->GetB()) < fCenMin || get_centrality(inEvent->GetB()) > fCenMax) continue;
             // if(!ULambda->at(iTrack)) continue;
@@ -874,13 +859,13 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
     std::vector<UParticle> *ULambda = nullptr;
     std::vector<UParticle> *UProton = nullptr; 
     std::vector<UParticle> *UPion = nullptr; 
-    std::vector<TVector3> *vecPolarization = nullptr;
+    std::vector<ROOT::Math::XYZVector > *vecPol = nullptr;
 
     UEvent *inEvent = new UEvent ();
 
     inChain->SetBranchAddress("event", &inEvent);
 
-    inChain->SetBranchAddress("Polarization", &vecPolarization);
+    inChain->SetBranchAddress("Polarization", &vecPol);
     inChain->SetBranchAddress("UProton", &UProton);
     inChain->SetBranchAddress("ULambda", &ULambda);
     inChain->SetBranchAddress("UPion", &UPion);
@@ -915,17 +900,17 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
         // inTree->GetEntry(iEvent);
         inChain->GetEntry(iEvent);
         int lambdas = 0;
-        for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
-            //std::cout << "pz: " << vecPolarization->at(pols_i).Z() * 100 << std::endl;
+        for (size_t pols_i = 0; pols_i < vecPol->size(); pols_i++){
+            //std::cout << "pz: " << vecPol->at(pols_i).Z() * 100 << std::endl;
             Double_t pT = ULambda->at(pols_i).GetMomentum().Pt();
             Double_t Y = ULambda->at(pols_i).GetMomentum().Rapidity();
             if (pT < fpTMin || pT > fpTMax || Y < fYmin || Y > fYmax) continue;
-            hPx_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).X() * 100);
-            hPy_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Y() * 100);
-            hPz_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPolarization->at(pols_i).Z() * 100);
-            hPx_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).X() * 100);
-            hPy_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).Y() * 100);
-            hPz_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPolarization->at(pols_i).Z() * 100);
+            hPx_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPol->at(pols_i).X() * 100);
+            hPy_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPol->at(pols_i).Y() * 100);
+            hPz_pT->Fill(ULambda->at(pols_i).GetMomentum().Pt(), vecPol->at(pols_i).Z() * 100);
+            hPx_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPol->at(pols_i).X() * 100);
+            hPy_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPol->at(pols_i).Y() * 100);
+            hPz_Y->Fill(ULambda->at(pols_i).GetMomentum().Rapidity(), vecPol->at(pols_i).Z() * 100);
         }
     }
 
@@ -938,15 +923,15 @@ void calc_pol_vs_Nenh(TString InFileName, TString OutFileName, std::vector<Int_t
     //         // inTree->GetEntry(iEvent);
     //         inChain->GetEntry(iEvent);
     //         int lambdas = 0;
-    //         for (size_t pols_i = 0; pols_i < vecPolarization->size(); pols_i++){
-    //             hPx_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).X());
-    //             hPy_Nlamb->Fill(enhFlag, vecPolarization->at(pols_i).Y());
-    //             hPmag_lamb->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
+    //         for (size_t pols_i = 0; pols_i < vecPol->size(); pols_i++){
+    //             hPx_Nlamb->Fill(enhFlag, vecPol->at(pols_i).X());
+    //             hPy_Nlamb->Fill(enhFlag, vecPol->at(pols_i).Y());
+    //             hPmag_lamb->Fill(enhFlag, TMath::Sqrt(vecPol->at(pols_i).X()*vecPol->at(pols_i).X()+vecPol->at(pols_i).Y()*vecPol->at(pols_i).Y()));
     //             if (ULambda->at(pols_i).GetMate() == -9){
     //                 lambdas++;
-    //                 hPx_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).X());
-    //                 hPy_Nenh->Fill(enhFlag, vecPolarization->at(pols_i).Y());
-    //                 hPmag_Nenh->Fill(enhFlag, TMath::Sqrt(vecPolarization->at(pols_i).X()*vecPolarization->at(pols_i).X()+vecPolarization->at(pols_i).Y()*vecPolarization->at(pols_i).Y()));
+    //                 hPx_Nenh->Fill(enhFlag, vecPol->at(pols_i).X());
+    //                 hPy_Nenh->Fill(enhFlag, vecPol->at(pols_i).Y());
+    //                 hPmag_Nenh->Fill(enhFlag, TMath::Sqrt(vecPol->at(pols_i).X()*vecPol->at(pols_i).X()+vecPol->at(pols_i).Y()*vecPol->at(pols_i).Y()));
     //                 if (lambdas > enhFlag) break;
     //             }
     //         }
@@ -1184,7 +1169,7 @@ Double_t get_centrality(Double_t fBVal){
 }
 
 
-TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol){ 
+ROOT::Math::XYZVector get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol){ 
     
     Double_t fPhi = 0;
 
@@ -1203,15 +1188,15 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     // Double_t polX = gRandom->Gaus(fpolx,fpolSx);  // generate polarization direction
     // Double_t polY = gRandom->Gaus(fpoly,fpolSy);  // generate polarization direction /100
     // Double_t polZ = gRandom->Gaus(fpolz,fpolSz);  // generate polarization direction
-    TVector3 polarizationVec = TVector3(polX, polY, polZ);
+    ROOT::Math::XYZVector polarizationVec = ROOT::Math::XYZVector(polX, polY, polZ);
 
     // std::cout<<"TVector3(polX, polY, polZ) "<<polX<<" "<<polY<<" "<<polZ<<std::endl;
 
     ROOT::Math::RotationZ rotateRP(fPhi);  // set rotation transformation
     polarizationVec = rotateRP*polarizationVec;  // rotate reaction plane
 
-    // Float_t polmag = TMath::Sqrt(polarizationVec.Mag());
-    Float_t polmag = TMath::Sqrt(polarizationVec.Mag2());
+    // Float_t polmag = TMath::Sqrt(polarizationVec.mag());
+    Float_t polmag = TMath::Sqrt(polarizationVec.mag2());
 
     // special case, overpolarized -> 100% polarized
     if (polmag>1.) {
@@ -1246,60 +1231,3 @@ TVector3 get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol)
     return polarizationVec;
 }
 
-
-TVector3 WignerRotatePolarization(const TVector3& pol_lab, const TLorentzVector& p_lambda_lab)
-{
-    // Если Λ почти в покое — вращать нечего
-    const TVector3 beta = p_lambda_lab.BoostVector();
-    const double   b2   = beta.Mag2();
-    if (b2 < 1e-16) return pol_lab.Unit();
-
-    const double gamma = 1.0 / std::sqrt(1.0 - b2);
-    const double bdotn = beta.Dot(pol_lab);
-
-    // Корректный спиновый 4-вектор в ЛАБ: S·p = 0
-    // S^0 = γ (β·n),  S^i = n^i + [γ^2/(γ+1)] (β·n) β^i
-    TVector3 S_spatial = pol_lab + ( (gamma*gamma)/(gamma+1.0) ) * bdotn * beta;
-    const double S_time = gamma * bdotn;
-    TLorentzVector S_lab(S_spatial.X(), S_spatial.Y(), S_spatial.Z(), S_time);
-
-    // «Канонический» буст в покой Λ — пространственная часть даёт ось после Wigner rotation
-    TLorentzVector S_rest = S_lab;
-    S_rest.Boost(-beta); // в RF Λ
-
-    TVector3 n_star = S_rest.Vect();
-    const double mag = pol_lab.Mag(); // сохраняем исходную длину |P|
-    const double nsm = n_star.Mag();
-    if (nsm > 0.0) n_star *= (mag / nsm);
-    return n_star.Unit(); // ось (нормированная)
-}
-
-// Double_t GetSubEventPlane(Int_t harmonic, const TClonesArray* particles, Bool_t isFirstSubEvent) {
-//     Double_t Qx = 0., Qy = 0.;
-//     Int_t count = 0;
-    
-//     // Random splitting seed for reproducibility
-//     TRandom3 rand(particles->GetEntries() + (isFirstSubEvent ? 0 : 1));
-    
-//     for (Int_t i = 0; i < particles->GetEntriesFast(); i++) {
-//         UParticle* part = (UParticle*)particles->At(i);
-        
-//         // Apply standard selection cuts
-//         if (part->GetCharge() == 0) continue;                     // Neutral particles
-//         if (TMath::Abs(part->Eta()) > 1.0) continue;              // η cut
-//         if (part->Pt() < 0.2 || part->Pt() > 2.0) continue;       // pT range
-        
-//         // Randomly assign to sub-events (50/50 split)
-//         if (rand.Rndm() > 0.5) continue;                          // Skip for second sub-event
-//         if (!isFirstSubEvent && rand.Rndm() <= 0.5) continue;     // Skip for first sub-event
-        
-//         Qx += TMath::Cos(harmonic * part->Phi());
-//         Qy += TMath::Sin(harmonic * part->Phi());
-//         count++;
-//     }
-    
-//     // Protection against low multiplicity
-//     if (count < 5) return -999.; 
-    
-//     return (1./harmonic) * TMath::ATan2(Qy, Qx);
-// }

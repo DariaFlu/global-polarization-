@@ -50,10 +50,13 @@ START_TIME=$(date +%s)
 root -l -b <<EOF
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_TVector3__cxx.so")
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_UParticle__cxx.so")
+gSystem->Load("${CONFIG_DIR}AutoDict_std__vector_ROOT__Math__XYZVector__cxx.so")
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_TVector3__cxx.so")
 gSystem->Load("${CONFIG_DIR}AutoDict_vector_UParticle__cxx.so")
+gSystem->Load("${CONFIG_DIR}AutoDict_std__vector_ROOT__Math__XYZVector__cxx.so")
+
 .L ${CONFIG_DIR}read_unigen_root.cpp
-simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 50)
+simulate_lambda_decays("${INPUT_DIR}${INPUT_FILE}", "${OUTPUT_DIR}${OUTPUT_FILE}", "${CONFIG_DIR}${CONFIG_FILE}", 1)
 .q
 EOF
 

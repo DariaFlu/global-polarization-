@@ -27,7 +27,10 @@ First run root with commands:
 ```bash
 gInterpreter->GenerateDictionary("vector<UParticle>", "vector;UParticle.h");
 gInterpreter->GenerateDictionary("vector<TVector3>", "vector;TVector3.h");
-
+gInterpreter->GenerateDictionary("std::vector<ROOT::Math::XYZVector>", "vector;Math/Vector3D.h");
+or
+root
+.L generate_dicts.c
 ```bash
 # Example usage of functions
 root -l -q 'simulate_lambda_decays.C("input.root", "output.root")'
