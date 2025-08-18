@@ -17,3 +17,4 @@ test*
 
 /slurm/*
 /lambda_analysis/*
+.nfs*
