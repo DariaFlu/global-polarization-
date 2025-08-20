@@ -26,6 +26,7 @@
 #include <TChain.h>
 #include "UEvent.h"
 #include "UParticle.h"
+#include "URun.h"
 
 #include "TInterpreter.h"
 
@@ -87,13 +88,44 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
     }
 
-    // TTree *outTree = new TTree("decays", "Lambda decay products");
+    // --- Copy URun object from first input file ---
+    // Извлекаем имя первого файла из TChain
+    TObjArray* fileElements = inChain->GetListOfFiles();
+    if (fileElements && fileElements->GetEntries() > 0) {
+        TChainElement* chEl = (TChainElement*)fileElements->At(0);
+        TString firstFileName = chEl->GetTitle();
 
+        TFile* fFirst = TFile::Open(firstFileName, "READ");
+        if (fFirst && !fFirst->IsZombie()) {
+            URun* inRun = nullptr;
+            fFirst->GetObject("run", inRun);
+            if (inRun) {
+                outFile->cd();
+                inRun->Write("run", TObject::kOverwrite);
+                std::cout << "Copied URun from " << firstFileName << std::endl;
+            } else {
+                std::cerr << "WARNING: URun object not found in " 
+                          << firstFileName << std::endl;
+            }
+            fFirst->Close();
+        }
+    }
+
+
+    // TTree *outTree = new TTree("decays", "Lambda decay products");
+    // URun  *inRun = nullptr;
+    // URun  *outRun = nullptr;
     // Event variables
     UEvent  *inEvent = nullptr;
     UEvent  *outEvent = new UEvent();
     inChain->SetBranchAddress("event", &inEvent);
+    // inChain->SetBranchAddress("run", &inRun);
 
+
+    // URun *outRun = new URun(*inRun);
+    //       outRun->SetTitle("Enhanced Lambda Decay Simulation");
+    //       outRun->Write("run", TObject::kOverwrite);
+    
     outTree = (TTree*)outFile->Get("decays");
     bool newTree = false;
     if (!outTree) {
@@ -104,6 +136,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         
         // Setup branches for new tree
         outTree->Branch("event", &outEvent);
+        // outTree->Branch("run", &outRun);
+
         outTree->Branch("cos_theta_p", &cos_theta_p);
         outTree->Branch("eventID", &eventID, "eventID/I");
         outTree->Branch("ULambda", &ULambda);
@@ -124,6 +158,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
         // Connect branches for existing tree
         outTree->SetBranchAddress("event", &outEvent);
+        // outTree->SetBranchAddress("run", &outRun);
+
         outTree->SetBranchAddress("cos_theta_p", &cos_theta_p);
         outTree->SetBranchAddress("eventID", &eventID);
         outTree->SetBranchAddress("ULambda", &ULambda);
@@ -172,6 +208,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         inChain->GetEntry(iEvent);
         outEvent->Clear(); // Clear previous event
         Int_t lambdaCounter = 0;
+
+        // if (!outRun) outRun = new URun();
+        // *outRun = *inRun;
 
         // Copy event header information
         outEvent->SetEventNr(inEvent->GetEventNr());
