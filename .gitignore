@@ -11,9 +11,13 @@
 
 #out file
 *.root
+!qa_out_xexe.root
 
 #test files
 test*
+
+#png files
+*.png
 
 /slurm/*
 /lambda_analysis/*

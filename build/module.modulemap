@@ -1,0 +1,7 @@
+module "gp_dict" {
+  requires cplusplus
+  module "/lhep/users/dflusova/lambda/afterburner/release/build/dict/GPDictTypes.hh" { header "/lhep/users/dflusova/lambda/afterburner/release/build/dict/GPDictTypes.hh" export * }
+  link "libgp_dict.so"
+  export *
+}
+
