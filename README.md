@@ -4,17 +4,30 @@ The afterburner for hyperon global polarization setting and analysis. Utilizes U
 
 ## Description
 
-This project consists of two separate parts:
+This project consists a set of scripts:
 
-1. `simulate_lambda_decays(TString inputFile, TString outputFile, Int_t flag = 1, Int_t enhanceStat = 1)`  
-   - Simulation of Λ decay into proton and pion
-   - Global polarization is measured with proton polarization
+1. `void add_enhanced_lambda(TString inputFile, TString outputFile, TString confInFile, Int_t enhanceStat)`
+
+   - Script for statistical lambda enhancement.
+   - Create XYZ polarization vector for all paricles in event. Only lambdas have non-null vector.
+   - Output files contains **event** in UEvent format and **XYZ-vector** for particles polarization. 
+
+2. `void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t enhanceStat)`
+
+   - Same as `add_enhanced_lambda()` with additional functions.
+   - Simulate Λ decay into proton and pion
    - Macro produces secondary particles and then puts polarization in proton
 
-2. `calc_global_polarization(TString InFileName, TString OutFileName)`  
+3. `void calc_global_polarization(TString fileIn , Int_t NFiles, TString OutFileName, Int_t enhancedFlag = -100)`
    - Measures global polarization with macro that provides transverse momentum and rapidity binning
    - Fits resulting angular distribution to get the value of global polarization
+   - Global polarization is measured with proton polarization
 
+4. `rootlogon.C` loads needed librarirs. 
+
+5. Repository contais some additional .cpp and .sh scripts.
+
+6. Examples for slurm script are presented in `startEnhLambdaPol.sh`, `startLambdaPolAnal.sh` and `startLambdaPolCalc.sh`,
 ---
 
 ## Requirements
@@ -23,18 +36,13 @@ The afterburner is intended to work with UrQMD generated data in unigen format.
 
 ## Usage
 
-First run root with commands:
-```bash
-gInterpreter->GenerateDictionary("vector<UParticle>", "vector;UParticle.h");
-gInterpreter->GenerateDictionary("vector<TVector3>", "vector;TVector3.h");
-gInterpreter->GenerateDictionary("std::vector<ROOT::Math::XYZVector>", "vector;Math/Vector3D.h");
-or
-root
-.L generate_dicts.c
-```bash
-# Example usage of functions
-root -l -q 'simulate_lambda_decays.C("input.root", "output.root")'
-root -l -q 'calc_global_polarization.C("output.root", "results.root")'
-# Example usage of main macro
-root -l -q 'root -x -q -b lambdaPolAnal.cpp'
-root -l -q 'root -x -q -b lambdaPolCalc.cpp'
+change path to mpdroot in CMakeList.txt (line 117, 120, 147, 155)
+``` bash
+source /path-to-mpdroot/thisroot.sh
+mkdir build && cd build
+cmake .. && make
+cd ../
+root .x rootlogon.C
+add_enhanced_lambda(...) #or other script
+````
+

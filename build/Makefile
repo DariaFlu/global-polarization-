@@ -57,10 +57,10 @@ RM = /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/CMake/v3.29.6-1/bin/cmake -E rm -
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/release
+CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/release/build
+CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles /lhep/users/dflusova/lambda/afterburner/release/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

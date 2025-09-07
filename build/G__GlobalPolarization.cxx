@@ -35,7 +35,7 @@
 #include "TDataMember.h"
 
 // Header files passed as explicit arguments
-#include "/lhep/users/dflusova/lambda/afterburner/release/build/dict/GPDictTypes.hh"
+#include "/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/GPDictTypes.hh"
 
 // Header files passed via #pragma extra_include
 
@@ -245,15 +245,15 @@ nullptr
     };
     static const char* includePaths[] = {
 "{PDROOT}/include",
-"/lhep/users/dflusova/lambda/afterburner/release",
-"/lhep/users/dflusova/lambda/afterburner/release/{PDROOT}/include",
+"/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-",
+"/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/{PDROOT}/include",
 "/lhep/users/dflusova/mpdroot/install/include",
-"/lhep/users/dflusova/lambda/afterburner/release",
-"/lhep/users/dflusova/lambda/afterburner/release/{PDROOT}/include",
+"/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-",
+"/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/{PDROOT}/include",
 "/lhep/users/dflusova/mpdroot/install/include",
 "/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/include",
 "/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/include/",
-"/lhep/users/dflusova/lambda/afterburner/release/build/",
+"/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/",
 nullptr
     };
     static const char* fwdDeclCode = R"DICTFWDDCLS(

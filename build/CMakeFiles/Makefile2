@@ -54,10 +54,10 @@ RM = /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/CMake/v3.29.6-1/bin/cmake -E rm -
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/release
+CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/release/build
+CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -85,14 +85,14 @@ clean: CMakeFiles/gp_macros.dir/clean
 CMakeFiles/gp_dict.dir/all: CMakeFiles/G__GlobalPolarization.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/gp_dict.dir/build.make CMakeFiles/gp_dict.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/gp_dict.dir/build.make CMakeFiles/gp_dict.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=3 "Built target gp_dict"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=3 "Built target gp_dict"
 .PHONY : CMakeFiles/gp_dict.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/gp_dict.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/gp_dict.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 0
 .PHONY : CMakeFiles/gp_dict.dir/rule
 
 # Convenience name for target.
@@ -111,14 +111,14 @@ CMakeFiles/gp_dict.dir/clean:
 CMakeFiles/G__GlobalPolarization.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/G__GlobalPolarization.dir/build.make CMakeFiles/G__GlobalPolarization.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/G__GlobalPolarization.dir/build.make CMakeFiles/G__GlobalPolarization.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=1,2 "Built target G__GlobalPolarization"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=1,2 "Built target G__GlobalPolarization"
 .PHONY : CMakeFiles/G__GlobalPolarization.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/G__GlobalPolarization.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/G__GlobalPolarization.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 0
 .PHONY : CMakeFiles/G__GlobalPolarization.dir/rule
 
 # Convenience name for target.
@@ -137,14 +137,14 @@ CMakeFiles/G__GlobalPolarization.dir/clean:
 CMakeFiles/gp_macros.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/gp_macros.dir/build.make CMakeFiles/gp_macros.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/gp_macros.dir/build.make CMakeFiles/gp_macros.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=4,5,6,7,8,9,10,11 "Built target gp_macros"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=4,5,6,7,8,9,10,11 "Built target gp_macros"
 .PHONY : CMakeFiles/gp_macros.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/gp_macros.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/gp_macros.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles 0
 .PHONY : CMakeFiles/gp_macros.dir/rule
 
 # Convenience name for target.

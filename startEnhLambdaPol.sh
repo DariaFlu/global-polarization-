@@ -19,7 +19,7 @@ export TASK_ID=${SLURM_ARRAY_TASK_ID}
 
 # Define paths (modify these as needed)
 INPUT_DIR="/eos/nica/mpd/users/parfenov/SimData/UrQMD/xexe_2.87gev_mf/6195240/files/mcini/" # dir with input UrQMD data
-CONFIG_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-" #path to afterburner
+CONFIG_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/" #path to afterburner
 SRC_DIR="/lhep/users/dflusova/lambda/afterburner/global-polarization-/src/" # path to afterburner/src
 OUTPUT_DIR="/scratch3/dflusova/afterburner/v.7/global-polarization-/out/" # path to afterburner/out
 BUILD_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build" # path to afterburner/build
@@ -51,35 +51,11 @@ export LD_LIBRARY_PATH="${BUILD_DIR}:${LD_LIBRARY_PATH}"
 
 # ----- Run ROOT non-interactively (use compiled plugin; no JIT, no AutoDict_*) -----
 
-# echo "#include \"${INCLUDE_DIR}/simulate_lambda_decays.hpp\"
-# gSystem->Load(\"${BUILD_DIR}/libgp_macros.so\");
-# gSystem->Load(\"${BUILD_DIR}/libgp_dict.so\");
-# simulate_lambda_decays(
-#   \"${INPUT_DIR}${INPUT_FILE}\",
-#   \"${OUTPUT_DIR}${OUTPUT_FILE}\",
-#   \"${CONFIG_DIR}${CONFIG_FILE}\",
-#   2
-# );" 
-# >> "${outfile}"
-
 echo "ROOT start"
-
-# root -b <<EOF
-# #include "${INCLUDE_DIR}/simulate_lambda_decays.hpp"
-# gSystem->Load("${BUILD_DIR}/libgp_macros");
-# gSystem->Load("${BUILD_DIR}/libgp_dict");
-# simulate_lambda_decays(
-#   "${INPUT_DIR}${INPUT_FILE}",
-#   "${OUTPUT_DIR}${OUTPUT_FILE}",
-#   "${CONFIG_DIR}${CONFIG_FILE}",
-#   2
-# )
-# .q
-# EOF
 
 root -b <<EOF
 .x ${CONFIG_DIR}rootlogon.C
-simulate_lambda_decays(
+add_enhanced_lambda(
   "${INPUT_DIR}${INPUT_FILE}",
   "${OUTPUT_DIR}${OUTPUT_FILE}",
   "${CONFIG_DIR}${CONFIG_FILE}",

@@ -53,10 +53,10 @@ RM = /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/CMake/v3.29.6-1/bin/cmake -E rm -
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/release
+CMAKE_SOURCE_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/release/build
+CMAKE_BINARY_DIR = /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/gp_macros.dir/depend.make
@@ -70,102 +70,102 @@ include CMakeFiles/gp_macros.dir/progress.make
 include CMakeFiles/gp_macros.dir/flags.make
 
 CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/calc_global_polarization.cpp
+CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_global_polarization.cpp
 CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o -MF CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o.d -o CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/calc_global_polarization.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o -MF CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o.d -o CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_global_polarization.cpp
 
 CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/calc_global_polarization.cpp > CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_global_polarization.cpp > CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.i
 
 CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/calc_global_polarization.cpp -o CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_global_polarization.cpp -o CMakeFiles/gp_macros.dir/src/calc_global_polarization.cpp.s
 
 CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/calc_pol_vs_Nenh.cpp
+CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_pol_vs_Nenh.cpp
 CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o -MF CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o.d -o CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/calc_pol_vs_Nenh.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o -MF CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o.d -o CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_pol_vs_Nenh.cpp
 
 CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/calc_pol_vs_Nenh.cpp > CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_pol_vs_Nenh.cpp > CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.i
 
 CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/calc_pol_vs_Nenh.cpp -o CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/calc_pol_vs_Nenh.cpp -o CMakeFiles/gp_macros.dir/src/calc_pol_vs_Nenh.cpp.s
 
 CMakeFiles/gp_macros.dir/src/getters.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/getters.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/getters.cpp
+CMakeFiles/gp_macros.dir/src/getters.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/getters.cpp
 CMakeFiles/gp_macros.dir/src/getters.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/gp_macros.dir/src/getters.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/getters.cpp.o -MF CMakeFiles/gp_macros.dir/src/getters.cpp.o.d -o CMakeFiles/gp_macros.dir/src/getters.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/getters.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/gp_macros.dir/src/getters.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/getters.cpp.o -MF CMakeFiles/gp_macros.dir/src/getters.cpp.o.d -o CMakeFiles/gp_macros.dir/src/getters.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/getters.cpp
 
 CMakeFiles/gp_macros.dir/src/getters.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/getters.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/getters.cpp > CMakeFiles/gp_macros.dir/src/getters.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/getters.cpp > CMakeFiles/gp_macros.dir/src/getters.cpp.i
 
 CMakeFiles/gp_macros.dir/src/getters.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/getters.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/getters.cpp -o CMakeFiles/gp_macros.dir/src/getters.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/getters.cpp -o CMakeFiles/gp_macros.dir/src/getters.cpp.s
 
 CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/read_unigen_root.cpp
+CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/read_unigen_root.cpp
 CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o -MF CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o.d -o CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/read_unigen_root.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o -MF CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o.d -o CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/read_unigen_root.cpp
 
 CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/read_unigen_root.cpp > CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/read_unigen_root.cpp > CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.i
 
 CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/read_unigen_root.cpp -o CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/read_unigen_root.cpp -o CMakeFiles/gp_macros.dir/src/read_unigen_root.cpp.s
 
 CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/set_lambda_parameterization.cpp
+CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/set_lambda_parameterization.cpp
 CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o -MF CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o.d -o CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/set_lambda_parameterization.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o -MF CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o.d -o CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/set_lambda_parameterization.cpp
 
 CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/set_lambda_parameterization.cpp > CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/set_lambda_parameterization.cpp > CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.i
 
 CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/set_lambda_parameterization.cpp -o CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/set_lambda_parameterization.cpp -o CMakeFiles/gp_macros.dir/src/set_lambda_parameterization.cpp.s
 
 CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/simulate_lambda_decays.cpp
+CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/simulate_lambda_decays.cpp
 CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o -MF CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o.d -o CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/simulate_lambda_decays.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o -MF CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o.d -o CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/simulate_lambda_decays.cpp
 
 CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/simulate_lambda_decays.cpp > CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/simulate_lambda_decays.cpp > CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.i
 
 CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/simulate_lambda_decays.cpp -o CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/simulate_lambda_decays.cpp -o CMakeFiles/gp_macros.dir/src/simulate_lambda_decays.cpp.s
 
 CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o: CMakeFiles/gp_macros.dir/flags.make
-CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o: /lhep/users/dflusova/lambda/afterburner/release/src/add_enhanced_lambda.cpp
+CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/add_enhanced_lambda.cpp
 CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o: CMakeFiles/gp_macros.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o -MF CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o.d -o CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o -c /lhep/users/dflusova/lambda/afterburner/release/src/add_enhanced_lambda.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o"
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o -MF CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o.d -o CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.o -c /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/add_enhanced_lambda.cpp
 
 CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.i"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/release/src/add_enhanced_lambda.cpp > CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.i
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/add_enhanced_lambda.cpp > CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.i
 
 CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.s"
-	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/release/src/add_enhanced_lambda.cpp -o CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.s
+	/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/GCC-ToolChain/v13.2.0-1/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/src/add_enhanced_lambda.cpp -o CMakeFiles/gp_macros.dir/src/add_enhanced_lambda.cpp.s
 
 # Object files for target gp_macros
 gp_macros_OBJECTS = \
@@ -204,7 +204,7 @@ libgp_macros.so: /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/lib/l
 libgp_macros.so: /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/lib/libThread.so.6.32.06
 libgp_macros.so: /cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/lib/libCore.so.6.32.06
 libgp_macros.so: CMakeFiles/gp_macros.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX shared module libgp_macros.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX shared module libgp_macros.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/gp_macros.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -216,6 +216,6 @@ CMakeFiles/gp_macros.dir/clean:
 .PHONY : CMakeFiles/gp_macros.dir/clean
 
 CMakeFiles/gp_macros.dir/depend:
-	cd /lhep/users/dflusova/lambda/afterburner/release/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /lhep/users/dflusova/lambda/afterburner/release /lhep/users/dflusova/lambda/afterburner/release /lhep/users/dflusova/lambda/afterburner/release/build /lhep/users/dflusova/lambda/afterburner/release/build /lhep/users/dflusova/lambda/afterburner/release/build/CMakeFiles/gp_macros.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization- /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization- /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/CMakeFiles/gp_macros.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/gp_macros.dir/depend
 

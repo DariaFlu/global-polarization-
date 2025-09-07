@@ -1,4 +1,4 @@
-# Install script for directory: /lhep/users/dflusova/lambda/afterburner/release
+# Install script for directory: /lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -49,7 +49,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib64/libgp_macros.so"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64" TYPE MODULE FILES "/lhep/users/dflusova/lambda/afterburner/release/build/libgp_macros.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib64" TYPE MODULE FILES "/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/libgp_macros.so")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib64/libgp_macros.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib64/libgp_macros.so")
     file(RPATH_CHANGE
@@ -70,5 +70,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/lhep/users/dflusova/lambda/afterburner/release/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

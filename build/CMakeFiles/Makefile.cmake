@@ -33,7 +33,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/cmake/ROOTConfig.cmake"
   "/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/cmake/RootMacros.cmake"
   "/cvmfs/nica.jinr.ru/sw/202309/slc7_x86-64/ROOT/v6.32.06-1/cmake/modules/FindVdt.cmake"
-  "/lhep/users/dflusova/lambda/afterburner/release/CMakeLists.txt"
+  "/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/CMakeLists.txt"
   "CMakeFiles/3.29.6/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.29.6/CMakeSystem.cmake"
   )

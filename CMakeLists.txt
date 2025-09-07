@@ -103,7 +103,8 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../rootlogon.C
 "    gROOT->ProcessLine(\"gSystem->Load(\\\"${CMAKE_CURRENT_BINARY_DIR}/libgp_dict\\\")\");\n"
 "    gROOT->ProcessLine(\"gSystem->Load(\\\"${CMAKE_CURRENT_BINARY_DIR}/libgp_macros\\\")\");\n"
 "    gROOT->ProcessLine(\".include \\\"${GP_INCLUDES_DIR}\\\"\");\n"
-"    gROOT->ProcessLine(\"#include \\\"${GP_INCLUDES_DIR}/simulate_lambda_decays.hpp\\\"\");\n"
+# "    gROOT->ProcessLine(\"#include \\\"${GP_INCLUDES_DIR}/simulate_lambda_decays.hpp\\\"\");\n"
+"    gROOT->ProcessLine(\"#include \\\"${GP_INCLUDES_DIR}/afterburner.hpp\\\"\");\n"
 "}
 "
 )

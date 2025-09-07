@@ -508,19 +508,19 @@ ROOT/RConfig.hxx
 cstring
 -
 
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/GPDictTypes.hh
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/GPDictTypes.hh
 vector
 -
 TVector3.h
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/TVector3.h
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/TVector3.h
 Math/Vector3D.h
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/Math/Vector3D.h
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/Math/Vector3D.h
 UParticle.h
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/UParticle.h
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/UParticle.h
 UParticle.h
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/UParticle.h
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/UParticle.h
 
-/lhep/users/dflusova/lambda/afterburner/release/build/dict/GPDict_LinkDef.h
+/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build/dict/GPDict_LinkDef.h
 
 /lhep/users/dflusova/mpdroot/install/include/UParticle.h
 TObject.h
