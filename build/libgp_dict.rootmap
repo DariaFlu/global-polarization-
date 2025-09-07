@@ -1,9 +1,0 @@
-{ decls }
-namespace std {  }
-
-[ libgp_dict.so ]
-# List of selected classes
-class vector<ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> >
-class vector<ROOT::Math::XYZVector>
-class vector<TVector3>
-class vector<UParticle>
