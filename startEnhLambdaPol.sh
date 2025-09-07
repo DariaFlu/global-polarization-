@@ -21,7 +21,7 @@ export TASK_ID=${SLURM_ARRAY_TASK_ID}
 INPUT_DIR="/eos/nica/mpd/users/parfenov/SimData/UrQMD/xexe_2.87gev_mf/6195240/files/mcini/" # dir with input UrQMD data
 CONFIG_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/" #path to afterburner
 SRC_DIR="/lhep/users/dflusova/lambda/afterburner/global-polarization-/src/" # path to afterburner/src
-OUTPUT_DIR="/scratch3/dflusova/afterburner/v.7/global-polarization-/out/" # path to afterburner/out
+OUTPUT_DIR="/scratch3/dflusova/afterburner/out/" # path to afterburner/out
 BUILD_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/build" # path to afterburner/build
 INCLUDE_DIR="/lhep/users/dflusova/lambda/afterburner/v.7/global-polarization-/include" # path to afterburner/include
 
