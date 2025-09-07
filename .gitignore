@@ -19,6 +19,7 @@ test*
 #png files
 *.png
 
+/build/
 /slurm/*
 /lambda_analysis/*
 .nfs*
