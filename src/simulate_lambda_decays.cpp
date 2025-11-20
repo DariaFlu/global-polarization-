@@ -137,7 +137,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     // --- Main event loop over input chain ---
     Long64_t nEvents = inChain->GetEntries();
     std::cout << "Events: " << nEvents << std::endl;
-
+ 
     for (Long64_t iEvent = 0; iEvent < nEvents; iEvent++) {
 
         // Load event from input chain
@@ -315,6 +315,8 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
         Double_t fEnhanceStat = enhanceStat;
         while (fEnhanceStat > 0) { // Repeat until enhancement counter is exhausted
             Int_t enhancedFlag = -9; // Mark these as "enhanced" Lambdas
+            // Index for newly added particles in event
+            Int_t indexOfEnhancedParticle = nParticles++;
 
             // Dummy random momentum (not really used; overwritten in parameterization)
             TLorentzVector mom_rand( 1., 1., 1., 1. );
@@ -326,14 +328,13 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                 get_random_value(0, 0.03),
                 get_random_value(0, 0.03)
             );
-
-            // Temporary enhanced Lambda
-            UParticle enhancedLambda(1, 1, 1, 1, 1, 1, 1, dummy,
-                                     1., 1., 1., 1., 1., 1., 1., 1., 1.);
-
+            // UniGen -> https://git.jinr.ru/nica/mpdroot/-/blob/dev/simulation/generators/unigenFormat/UParticle.h
+            // Enhanced Lambda with fMate == -9
+            UParticle enhancedLambda(indexOfEnhancedParticle, 3122, 1, 1, 1, enhancedFlag, // Use Mate to tag enhanced particles
+                                    -1, child_null,
+                                    1., 1., 1., 1., 1., 1., 1., 1., 1.);  //Dummy parameters mom(px,py,pz,e), pos(x,y,z,t) and fWeight == 1
             enhancedLambda.SetPosition(pos_rand);
-            enhancedLambda.SetMate(enhancedFlag); // Use Mate to tag enhanced particles
-
+            
             // Sample Lambda kinematics from parameterization/yield
             set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
             Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
@@ -393,9 +394,6 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             TLorentzVector proton_rest(p_proton_rest, sqrt(pStar*pStar + mProton*mProton));
             TLorentzVector pion_rest  (p_pion_rest,   sqrt(pStar*pStar + mPion  *mPion  ));
 
-            // Index for newly added particles in event
-            Int_t indexOfEnhancedParticle = nParticles++;
-
             // Enhanced decay products (tagged with enhancedFlag)
             UParticle protonEnhanced(
                 indexOfEnhancedParticle, 2212, 0, indexOfEnhancedParticle, indexOfEnhancedParticle, enhancedFlag, -1,
@@ -445,6 +443,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     c1->cd(4); hLambdaPhi->Draw();
 
     c1->SaveAs("lambda_decays_plots.png");
+    c1->SaveAs("lambda_decays_plots.C");
 
     // --- Cleanup ---
     delete c1;

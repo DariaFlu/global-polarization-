@@ -117,9 +117,9 @@ void add_enhanced_lambda(TString inputFile, TString outputFile, TString confInFi
     const double anisotropy = 0.732;   // Decay anisotropy parameter (αΛ)
     Int_t child_null[2] = {0, 0};      // Children indices placeholder for UParticle
 
-    // Process events
+ 
+    // --- Main event loop over input chain ---
     Long64_t nEvents = inChain->GetEntries();
-
     std::cout << "Events: " << nEvents << std::endl;
     for (Long64_t iEvent = 0; iEvent < nEvents; iEvent++) {
         // Load event from input chain
@@ -179,7 +179,7 @@ void add_enhanced_lambda(TString inputFile, TString outputFile, TString confInFi
                 vecPolarization->push_back(nullPol);
                 continue; 
             }
-            // If this is a Lambda (PDG 3122), process its decay
+            // If this is a Lambda (PDG 3122)
             else lambdaCounter++;
 
             // Copy current Lambda to local container
@@ -203,48 +203,56 @@ void add_enhanced_lambda(TString inputFile, TString outputFile, TString confInFi
             // Fill histograms
             hLambdaPhi->Fill(get_positive_phi(lambda.GetMomentum().Phi()));
 
-            // --- Artificial enhancement of Lambda statistics ---
-            Double_t fEnhanceStat = enhanceStat;
-            while(fEnhanceStat > 1){ // Repeat until enhancement counter is exhausted
-                Int_t enhancedFlag = -9; // Mark these as "enhanced" Lambdas
+        }
+        // Total number of particles in original event
+        Int_t nParticles = inEvent->GetNpa();
 
-                // Dummy random momentum (not really used; overwritten in parameterization)
-                TLorentzVector mom_rand( 1., 1., 1., 1. );
-                
-                // Randomized position for enhanced Lambda inside some small volume
-                TLorentzVector pos_rand(
-                    get_random_value(lambda.X(), 0.03),
-                    get_random_value(lambda.Y(), 0.03),
-                    get_random_value(lambda.Z(), 0.03),
-                    get_random_value(lambda.T(), 0.03)
-                );
+        // --- Artificial enhancement of Lambda statistics ---
+        Double_t fEnhanceStat = enhanceStat;
+        while(fEnhanceStat > 0){ // Repeat until enhancement counter is exhausted
+            Int_t enhancedFlag = -9; // Mark these as "enhanced" Lambdas
 
-                // Temporary enhanced Lambda
-                UParticle enhancedLambda(lambda);
-                enhancedLambda.SetPosition(pos_rand);
-                enhancedLambda.SetMate(enhancedFlag);
+            // Dummy random momentum (not really used; overwritten in parameterization)
+            TLorentzVector mom_rand( 1., 1., 1., 1. );
+            
+            // Randomized position for enhanced Lambda inside some small volume
+            TLorentzVector pos_rand(
+                get_random_value(0, 0.03),
+                get_random_value(0, 0.03),
+                get_random_value(0, 0.03),
+                get_random_value(0, 0.03)
+            );
+            // Index for newly added particles in event
+            Int_t indexOfEnhancedParticle = nParticles++;
 
-                // Sample Lambda kinematics from parameterization/yield
-                set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
-                fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
-                
-                // 4-momentum in lab frame
-                TLorentzVector lambda_lab = enhancedLambda.GetMomentum();
-                hLambdaPt->Fill(lambda_lab.Pt());
-                
-                // Polarization for enhanced Lambda
-                ROOT::Math::XYZVector pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
-                vecPolarization->push_back(pol);
+            // Enhanced Lambda
+            // UniGen -> https://git.jinr.ru/nica/mpdroot/-/blob/dev/simulation/generators/unigenFormat/UParticle.h
+            // Enhanced Lambda with fMate == -9
+            UParticle enhancedLambda(indexOfEnhancedParticle, 3122, 1, 1, 1, enhancedFlag, // Use Mate to tag enhanced particles
+                                    -1, child_null,
+                                    1., 1., 1., 1., 1., 1., 1., 1., 1.);  //Dummy parameters mom(px,py,pz,e), pos(x,y,z,t) and fWeight == 1
+            enhancedLambda.SetPosition(pos_rand);
 
-                // Fill QA histograms for enhanced sample
-                hLambdaPhi->Fill(get_positive_phi(enhancedLambda.GetMomentum().Phi()));
+            // Sample Lambda kinematics from parameterization/yield
+            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+            Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
+            
+            // 4-momentum in lab frame
+            TLorentzVector lambda_lab = enhancedLambda.GetMomentum();
+            hLambdaPt->Fill(lambda_lab.Pt());
+            
+            // Polarization for enhanced Lambda
+            ROOT::Math::XYZVector pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
+            vecPolarization->push_back(pol);
 
-                // Add enhanced Lambda and its products to output event and vectors
-                outEvent->AddParticle(enhancedLambda);
+            // Fill QA histograms for enhanced sample
+            hLambdaPhi->Fill(get_positive_phi(enhancedLambda.GetMomentum().Phi()));
 
-                // Decrease enhancement counter
-                fEnhanceStat--;
-            }
+            // Add enhanced Lambda and its products to output event and vectors
+            outEvent->AddParticle(enhancedLambda);
+
+            // Decrease enhancement counter
+            fEnhanceStat--;
         }
         // Store current event into the output tree
         outTree->Fill();
@@ -267,6 +275,7 @@ void add_enhanced_lambda(TString inputFile, TString outputFile, TString confInFi
     c1->cd(4); hLambdaPhi->Draw();
 
     c1->SaveAs("lambda_decays_plots.png");
+    c1->SaveAs("lambda_decays_plots.C");
 
     // --- Cleanup ---
     delete c1;
