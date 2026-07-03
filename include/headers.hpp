@@ -11,6 +11,8 @@
 #include "TStyle.h"
 #include "TSystem.h"
 
+#include "TObjArray.h"
+
 // Physics-specific includes
 #include "TLorentzVector.h"
 #include "TVector3.h"
@@ -26,6 +28,7 @@
 #include "TH2D.h"
 #include "TH3D.h"
 #include "TF1.h"
+
 #include "TProfile.h"
 #include "TCanvas.h"
 #include "TLegend.h"

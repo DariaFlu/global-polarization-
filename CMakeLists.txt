@@ -67,8 +67,11 @@ set(GP_SOURCES
   src/getters.cpp
   src/read_unigen_root.cpp
   src/set_lambda_parameterization.cpp
+  src/set_phi_parameterization.cpp
   src/simulate_lambda_decays.cpp
   src/add_enhanced_lambda.cpp
+  src/add_enhanced_phi.cpp
+
 )
 
 set(GP_INCLUDES
@@ -78,8 +81,10 @@ set(GP_INCLUDES
   include/headers.hpp
   include/read_unigen_root.hpp
   include/set_lambda_parameterization.hpp
+  include/set_phi_parameterization.hpp
   include/simulate_lambda_decays.hpp
   include/add_enhanced_lambda.hpp
+  include/add_enhanced_phi.hpp
 )
 
 # -----------------------------------------------------------------------------

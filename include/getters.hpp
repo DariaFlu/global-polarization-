@@ -15,5 +15,14 @@ Double_t get_positive_phi(const Double_t& phi);
 Double_t get_centrality  (Double_t fBVal);
 Double_t get_costh(Double_t alpha, Double_t pol = 0.6);
 Double_t get_V2   (Double_t sNN, Double_t centrality, Double_t lambda_pT, Double_t lambda_y);
-Int_t    get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue, Int_t NBins); 
+Int_t    get_number_of_bin(Double_t fValue, Double_t fMinValue, Double_t fMaxValue, Int_t NBins);
+Double_t get_v1_lambda(Double_t sNN, Double_t centrality, Double_t lambda_pT, Double_t lambda_y);
+Double_t get_v1_phi_from_lambda(Double_t pT_phi, Double_t y_phi, Double_t centrality, Double_t sNN, Double_t f_scale);
+Double_t get_v2_lambda(Double_t lambda_pT, Double_t lambda_y, Double_t centrality, Double_t sNN);
+Double_t get_v2_phi_from_lambda(Double_t pT_phi, Double_t y_phi, Double_t centrality, Double_t sNN);
 ROOT::Math::XYZVector get_pol_lambda(UParticle& lambda, Double_t _fpoly, Double_t _fSigmaPol = 0.3);
+
+Double_t get_random_value_rand(TRandom3 &rand, Double_t fMean, Double_t fSigma);
+Double_t wrap_delta_0_2pi(Double_t d);
+TChain* build_chain_subset(const TString& pattern, Long64_t fileStart, Long64_t fileCount);
+TH2* pick_yield_hist(TFile* Phi_yield, Double_t centrality);

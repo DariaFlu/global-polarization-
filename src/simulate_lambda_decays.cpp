@@ -7,7 +7,7 @@
 // - outputFile : ROOT file where "decays" tree is stored/updated
 // - confInFile : ROOT file with parameterization / yields for Lambda
 // - enhanceStat: factor to artificially enhance Lambda statistics
-void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t enhanceStat) {
+void simulate_lambda_decays(TString inputFile, TString outputFile, TString confInFile, Int_t enhanceStat, UInt_t seed) {
 
     // Input chain and output file/tree
     TChain *inChain = nullptr;
@@ -126,7 +126,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                    1., 1., 1., 1., 1., 1., 1., 1., 1.);
 
     // --- Physics constants and parameters ---
-    TRandom3* rand = new TRandom3(0);  // Random number generator with fixed seed
+    // TRandom3* rand = new TRandom3(0);  // Random number generator with fixed seed
+    TRandom3 rand(seed); // Random number generator with fixed seed
+    std::cout << "RNG seed = " << seed << std::endl;
     const double mLambda = 1.115683;   // Λ mass [GeV/c^2]
     const double mProton = 0.938272;   // Proton mass [GeV/c^2]
     const double mPion   = 0.139570;   // Pion mass [GeV/c^2]
@@ -177,9 +179,9 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
                 // Random position (x, y, z, t) for the new Lambda
                 TLorentzVector newLambdaPos( 
-                    get_random_value(0, 12), 
-                    get_random_value(0, 12), 
-                    get_random_value(0, 20), 
+                    get_random_value_rand(rand, 0, 12),
+                    get_random_value_rand(rand, 0, 12),
+                    get_random_value_rand(rand, 0, 20),
                     0
                 );
 
@@ -213,7 +215,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             lambda = *part;
 
             // Set kinematic / yield parameterization based on impact parameter, etc.
-            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), lambda); 
+            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), lambda, rand); 
             Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
 
             // --- Lambda 4-momentum in lab frame ---
@@ -231,7 +233,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                                 (2*mLambda);
 
             // Random azimuthal angle for decay
-            double phi = rand->Uniform(0, 2*TMath::Pi());
+            double phi = rand.Uniform(0, 2*TMath::Pi());
 
             // Get polarization vector for current Lambda
             ROOT::Math::XYZVector pol = get_pol_lambda(lambda, fPolY/100., fSigmaPolVal);
@@ -323,10 +325,10 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
 
             // Randomized position for enhanced Lambda inside some small volume
             TLorentzVector pos_rand(
-                get_random_value(0, 0.03),
-                get_random_value(0, 0.03),
-                get_random_value(0, 0.03),
-                get_random_value(0, 0.03)
+                get_random_value_rand(rand, 0, 12),
+                get_random_value_rand(rand, 0, 12),
+                get_random_value_rand(rand, 0, 20),
+                get_random_value_rand(rand, 0, 0.03)
             );
             // UniGen -> https://git.jinr.ru/nica/mpdroot/-/blob/dev/simulation/generators/unigenFormat/UParticle.h
             // Enhanced Lambda with fMate == -9
@@ -336,7 +338,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
             enhancedLambda.SetPosition(pos_rand);
             
             // Sample Lambda kinematics from parameterization/yield
-            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda); 
+            set_lambda_parameterization(Lambda_yield, inEvent->GetB(), enhancedLambda, rand); 
             Double_t fPolY = get_mean_polarization(2.87, get_centrality(inEvent->GetB()));
 
             // 4-momentum in lab frame
@@ -349,7 +351,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
                                 (mLambda*mLambda - (mProton - mPion)*(mProton - mPion))) /
                                 (2*mLambda);
 
-            double phi = rand->Uniform(0, 2*TMath::Pi());
+            double phi = rand.Uniform(0, 2*TMath::Pi());
 
             // Polarization for enhanced Lambda
             ROOT::Math::XYZVector pol = get_pol_lambda(enhancedLambda, fPolY/100., fSigmaPolVal);
@@ -448,7 +450,7 @@ void simulate_lambda_decays(TString inputFile, TString outputFile, TString confI
     // --- Cleanup ---
     delete c1;
     delete outEvent;
-    delete rand;
+    // delete rand;
     delete inChain;
 
     outFile->Close();
