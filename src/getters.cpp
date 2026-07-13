@@ -388,21 +388,111 @@ return v2;
 }
 
 // Helper: NCQ-scaling to get v2_phi from Lambda v2
-Double_t get_v2_phi_from_lambda(Double_t pT_phi,
-           Double_t y_phi,
-           Double_t centrality,
-           Double_t sNN)
-{
-// Map phi pT to "effective" Lambda pT using NCQ scaling
-Double_t pT_Lambda_eff = pT_phi * 3.0 / 2.0;
+// Double_t get_v2_phi_from_lambda(Double_t pT_phi,
+//            Double_t y_phi,
+//            Double_t centrality,
+//            Double_t sNN)
+// {
+// // Map phi pT to "effective" Lambda pT using NCQ scaling
+// Double_t pT_Lambda_eff = pT_phi * 3.0 / 2.0;
 
-// Lambda v2 at (pT_Lambda_eff, y_phi, centrality, sNN)
+// // Lambda v2 at (pT_Lambda_eff, y_phi, centrality, sNN)
+// Double_t v2_Lambda = get_v2_lambda(pT_Lambda_eff, y_phi, centrality, sNN);
+
+// // phi v2 via NCQ scaling:
+// Double_t v2_phi = (2.0 / 3.0) * v2_Lambda;
+
+// // Safety: limit |v2| <= 1
+// if (v2_phi > 1.0)  v2_phi = 1.0;
+// if (v2_phi < -1.0) v2_phi = -1.0;
+
+// return v2_phi;
+// }
+/*
+Double_t get_v2_phi_from_lambda(Double_t pT_phi,
+  Double_t y_phi,
+  Double_t centrality,
+  Double_t sNN)
+{
+  const Double_t mPhi    = 1.019461;   // GeV/c^2
+  const Double_t mLambda = 1.115683;   // GeV/c^2
+
+  const Double_t nqPhi    = 2.0;
+  const Double_t nqLambda = 3.0;
+
+  // phi transverse kinetic energy
+  Double_t mT_phi  = std::sqrt(pT_phi * pT_phi + mPhi * mPhi);
+  Double_t KEt_phi = mT_phi - mPhi;
+
+  // NCQ scaling in KE_T / nq
+  Double_t KEt_lambda = (nqLambda / nqPhi) * KEt_phi;
+
+  // Convert back to effective Lambda pT
+  Double_t mT_lambda = KEt_lambda + mLambda;
+  Double_t arg = mT_lambda * mT_lambda - mLambda * mLambda;
+
+  Double_t pT_Lambda_eff = 0.0;
+  if (arg > 0.0)
+    pT_Lambda_eff = std::sqrt(arg);
+
+  // Lambda v2 at mapped pT
+  Double_t v2_Lambda = get_v2_lambda(pT_Lambda_eff, y_phi, centrality, sNN);
+
+  // NCQ scaling back to phi
+  Double_t v2_phi = (nqPhi / nqLambda) * v2_Lambda;
+
+// HARD floor: no negative v2 for phi in this scenario
+if (v2_phi < 0.0)
+    v2_phi = 0.0;
+
+// // Optional mild pT-shape boost
+// Double_t boost = 1.0 + 0.5 * (1.0 - std::exp(-pT_phi / 0.5));
+// v2_phi *= boost;
+
+if (v2_phi > 1.0)  v2_phi = 1.0;
+
+  // Safety
+  // if (v2_phi > 1.0)  v2_phi = 1.0;
+  // if (v2_phi < -1.0) v2_phi = -1.0;
+
+  return v2_phi;
+}
+*/
+
+Double_t get_v2_phi_from_lambda(Double_t pT_phi,
+  Double_t y_phi,
+  Double_t centrality,
+  Double_t sNN)
+{
+const Double_t mPhi    = 1.019461;
+const Double_t mLambda = 1.115683;
+const Double_t nqPhi    = 2.0;
+const Double_t nqLambda = 3.0;
+
+Double_t mT_phi  = std::sqrt(pT_phi * pT_phi + mPhi * mPhi);
+Double_t KEt_phi = mT_phi - mPhi;
+
+Double_t KEt_lambda = (nqLambda / nqPhi) * KEt_phi;
+Double_t mT_lambda  = KEt_lambda + mLambda;
+Double_t arg        = mT_lambda * mT_lambda - mLambda * mLambda;
+
+Double_t pT_Lambda_eff = 0.0;
+if (arg > 0.0)
+pT_Lambda_eff = std::sqrt(arg);
+
 Double_t v2_Lambda = get_v2_lambda(pT_Lambda_eff, y_phi, centrality, sNN);
 
-// phi v2 via NCQ scaling:
-Double_t v2_phi = (2.0 / 3.0) * v2_Lambda;
+// Pure NCQ scaling
+Double_t v2_phi = (nqPhi / nqLambda) * v2_Lambda;
 
-// Safety: limit |v2| <= 1
+// Smooth rapidity envelope to tame large-|y| tails
+// const Double_t sigma_y = 1.0; // tune: 0.8–1.2
+// Double_t damp_y = std::exp(-0.5 * (y_phi * y_phi) / (sigma_y * sigma_y));
+// v2_phi *= damp_y;
+
+// Optional: forbid very large negative values but *no hard floor*:
+// if (v2_phi < -0.1) v2_phi = -0.1;
+
 if (v2_phi > 1.0)  v2_phi = 1.0;
 if (v2_phi < -1.0) v2_phi = -1.0;
 
